@@ -1,0 +1,37 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Neox.Helpers;
+using Neox.Extensions;
+
+#if UNITY_EDITOR
+using UnityEditor;
+
+namespace Neox.EditorTools
+{	
+	public class #SCRIPTNAME# : EditorWindow
+	{
+		[MenuItem("Window/Neox Studios/#SCRIPTNAME#")]
+		static void CreateWindow()
+		{
+			GetWindow(typeof(#SCRIPTNAME#));
+		}
+		
+		// --------------------------------------------------------------------------------------------
+		private void OnEnable()
+		{
+			
+		}
+
+		// --------------------------------------------------------------------------------------------
+		private void OnGUI()
+		{
+
+		
+		}
+
+		// --------------------------------------------------------------------------------------------
+	}
+}
+#endif

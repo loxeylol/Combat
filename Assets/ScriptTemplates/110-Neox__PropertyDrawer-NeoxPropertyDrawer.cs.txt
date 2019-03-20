@@ -1,0 +1,22 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using Neox.Helpers;
+using Neox.Extensions;
+
+[CustomPropertyDrawer(typeof())]
+public class #SCRIPTNAME# : NeoxPropertyDrawer
+{
+    protected override bool DrawDefaultFoldout { get { return true; } }
+
+    // --------------------------------------------------------------------------------------------
+
+    protected override void DrawCustomGUI(SerializedProperty property, GUIContent defaultLabel)
+    {
+
+    }
+
+    // --------------------------------------------------------------------------------------------
+}
