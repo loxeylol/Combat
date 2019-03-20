@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Values")]
     [SerializeField, Range(0f, 20f)] private float _movementSpeed;
-    //[SerializeField] private bool _rotateFree;
+    [SerializeField] private bool _rotateFree;
     [SerializeField, Range(0, 720)] private int _freeRotationSpeed;
     [SerializeField, Range(2, 24)] private int _intervallRange = 16;
     [SerializeField, Range(0f, 1f)] private float _intervalRotationDelay = .25f;
@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     [Header("Bullet and Spawner")]
     [SerializeField] private BulletBehaviour _bulletPrefab;
     [SerializeField] private Transform _bulletSpawn;
-    //[SerializeField] private SettingsManager.FireModes _fireModeEnum;
+    [SerializeField] private SettingsManager.FireModes _fireModeEnum;
 
     [SerializeField] private bool _isInvisibleTankMode = false;
 
@@ -50,12 +50,13 @@ public class PlayerController : MonoBehaviour
     private const float MAX_SPEED = 20f;
 
     // --- Properties -------------------------------------------------------------------------------------------------
-    public SettingsManager.FireModes FireMode { get => SettingsManager.SelectedFireMode; }
+    //public SettingsManager.FireModes FireMode { get => SettingsManager.SelectedFireMode; }
     public bool WasHit { get; set; }
     public bool CanMove { get; set; }
     public bool IsPlayerMeshVisible { get; set; }
     public float RotationInput { get { return _input.x; } }
     public int Score { get; set; }
+
     private float RotationInterval { get { return 360f / _intervallRange; } }
     private float Speed { get { return _movementSpeed; } set { _movementSpeed = Mathf.Clamp(value, MIN_SPEED, MAX_SPEED); } }
     private bool CanShoot { get { return _currentBullet == null; } }
@@ -68,8 +69,10 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _playerMesh = GetComponent<MeshRenderer>();
         IsPlayerMeshVisible = true;
-        
-        
+        //Ins Menu damit
+        SettingsManager.SelectedFireMode = _fireModeEnum;
+        SettingsManager.InvisibleTankMode = _isInvisibleTankMode;
+        SettingsManager.FreePlayerRotation = _rotateFree;
         if (SettingsManager.InvisibleTankMode)
         {
             _playerMesh.enabled = TogglePlayerMesh();
@@ -101,7 +104,8 @@ public class PlayerController : MonoBehaviour
 
             if (CanShoot && Input.GetKey(_fireKey))
             {
-                ShootNormalBullet();
+                
+                SwitchFireMode((int) SettingsManager.SelectedFireMode);
             }
            
             
@@ -169,10 +173,6 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(GotHitRoutine());
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
-    private void SelectRightFireMode(SettingsManager.FireModes selectedMode)
-    {
-       
-    }
 
     private Vector3 RotatePlayerAfterHitting()
     {

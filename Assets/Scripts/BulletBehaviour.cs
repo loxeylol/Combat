@@ -12,7 +12,7 @@ public class BulletBehaviour : MonoBehaviour
     // --- Nested Classes ---------------------------------------------------------------------------------------------
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField, Range(0f, 10f)] private float _speed;
+    [SerializeField, Range(0f, 10f)] private float _speed = 7f;
     [SerializeField, Range(0.1f, 5f)] private float _lifeTime = 2f;
 
     [SerializeField] private bool _canBeDirected = true;
@@ -37,7 +37,7 @@ public class BulletBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (_canBeDirected)
+        if (SettingsManager.CanBulletsBeDirected)
         {
             ApplyPlayerRotation();
         }

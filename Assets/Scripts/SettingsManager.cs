@@ -21,15 +21,15 @@ public class SettingsManager : MonoBehaviour
     {
         public bool _freePlayerRotation = true;
         public bool _friendlyFire = true;
-        public bool _bouncyBullets = true;
+        public bool _bouncyBullets;
         public bool _invisibleTankMode = false;
+        public bool _canBulletsBeDirected;
         public FireModes _fireModes = FireModes.Straight;
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------    
     private static Settings _settings;
 
-    [SerializeField] private FireModes _fireModeEnum;
     // --- Properties -------------------------------------------------------------------------------------------------
     public static bool FreePlayerRotation
     {
@@ -44,7 +44,7 @@ public class SettingsManager : MonoBehaviour
     public static bool BouncyBullets
     {
         get { return _settings._bouncyBullets; }
-        set { _settings._bouncyBullets = value; }
+        set { _settings._bouncyBullets = SelectedFireMode == FireModes.Ricochet; }
     }
     public static bool InvisibleTankMode
     {
@@ -54,7 +54,12 @@ public class SettingsManager : MonoBehaviour
     public static FireModes SelectedFireMode
     {
         get { return _settings._fireModes; }
-        set { _settings._fireModes = Instance._fireModeEnum; }
+        set { _settings._fireModes = value; }
+    }
+    public static bool CanBulletsBeDirected
+    {
+        get { return SelectedFireMode == FireModes.Guided || SelectedFireMode == FireModes.GuidedRicochet; }
+
     }
 
 
@@ -79,10 +84,7 @@ public class SettingsManager : MonoBehaviour
 
 
     }
-    private void Update()
-    {
-        Debug.Log(SelectedFireMode);
-    }
+
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
 
