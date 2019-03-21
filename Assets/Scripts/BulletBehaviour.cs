@@ -21,7 +21,7 @@ public class BulletBehaviour : MonoBehaviour
     private SphereCollider _col;
     private LevelBounds _wall;
     private Rigidbody _rb;
-    private Vector3 direction;
+    
 
     // --- Properties -------------------------------------------------------------------------------------------------
     public PlayerController Player { get; set; }
@@ -32,7 +32,7 @@ public class BulletBehaviour : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<SphereCollider>();
         Destroy(this.gameObject, _lifeTime);
-        direction = transform.forward;
+       
     }
 
     private void Update()
@@ -68,13 +68,19 @@ public class BulletBehaviour : MonoBehaviour
         {
             if (hitPlayer != Player || SettingsManager.FriendlyFire)
             {
-                Player.Score += Player == hitPlayer ? -1 : +1;
-                Player.StartCoroutineWhenHitting();
-                hitPlayer.GetHit(collision);
+                if (!hitPlayer.IsInvincible)
+                {
+                    Player.Score += Player == hitPlayer ? -1 : +1;
+                    
+                    Player.StartCoroutineWhenHitting();
+                    //hitPlayer.GetHit(collision);
+                    hitPlayer.GetHitInDirecTionFromBullet(transform.forward, collision);
+                }
+                
             }
             Destroy(gameObject);
         }
-        //LevelBounds hitWall = collision.gameObject.GetComponent<LevelBounds>();
+        
         if (collision.gameObject.CompareTag("Wall"))
         {
             if (!SettingsManager.BouncyBullets)

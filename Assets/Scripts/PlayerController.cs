@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neox.Helpers;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,24 +21,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 20f)] private float _movementSpeed;
     [SerializeField] private bool _rotateFree;
     [SerializeField, Range(0, 720)] private int _freeRotationSpeed;
-    [SerializeField, Range(2, 24)] private int _intervallRange = 16;
     [SerializeField, Range(0f, 1f)] private float _intervalRotationDelay = .25f;
     [SerializeField] private float _gotHitRotationSpeed = 20;
+
     [Header("Bullet and Spawner")]
     [SerializeField] private BulletBehaviour _bulletPrefab;
     [SerializeField] private Transform _bulletSpawn;
-    [SerializeField] private SettingsManager.FireModes _fireModeEnum;
-
-    [SerializeField] private bool _isInvisibleTankMode = false;
 
     private BoxCollider _collider;
     private Rigidbody _rb;
     private MeshRenderer _playerMesh;
+    [SerializeField] private MeshRenderer _turretMesh;
+    [SerializeField] private MeshRenderer _playerTextMesh;
     private BulletBehaviour _currentBullet;
 
 
 
-    
+
     private Vector2 _input;
     private Vector3 _startPos;
 
@@ -50,34 +50,31 @@ public class PlayerController : MonoBehaviour
     private const float MAX_SPEED = 20f;
 
     // --- Properties -------------------------------------------------------------------------------------------------
-    //public SettingsManager.FireModes FireMode { get => SettingsManager.SelectedFireMode; }
+    public delegate void PlayerScoreDelegate(int score);
+    public PlayerScoreDelegate getScore;
+    public bool IsInvincible { get; set; }
     public bool WasHit { get; set; }
     public bool CanMove { get; set; }
-    public bool IsPlayerMeshVisible { get; set; }
+    public bool IsPlayerMeshVisible { get => !SettingsManager.InvisibleTankMode; }
+    //for bullet rotation
     public float RotationInput { get { return _input.x; } }
     public int Score { get; set; }
-
-    private float RotationInterval { get { return 360f / _intervallRange; } }
+    private float RotationInterval { get { return 360f / SettingsManager.PlayerRotationSteps; } }
     private float Speed { get { return _movementSpeed; } set { _movementSpeed = Mathf.Clamp(value, MIN_SPEED, MAX_SPEED); } }
     private bool CanShoot { get { return _currentBullet == null; } }
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
-        
+
         _collider = GetComponent<BoxCollider>();
         _rb = GetComponent<Rigidbody>();
         _playerMesh = GetComponent<MeshRenderer>();
-        IsPlayerMeshVisible = true;
-        //Ins Menu damit
-        SettingsManager.SelectedFireMode = _fireModeEnum;
-        SettingsManager.InvisibleTankMode = _isInvisibleTankMode;
-        SettingsManager.FreePlayerRotation = _rotateFree;
-        if (SettingsManager.InvisibleTankMode)
-        {
-            _playerMesh.enabled = TogglePlayerMesh();
-        }
-        
+
+        IsInvincible = false;
+        _playerMesh.enabled = IsPlayerMeshVisible ? true : false;
+        _turretMesh.enabled = IsPlayerMeshVisible ? true : false;
+        _playerTextMesh.enabled = IsPlayerMeshVisible ? true : false;
         _rotateTimer = 0f;
         _bulletTimer = 0f;
         CanMove = true;
@@ -86,9 +83,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-       
-        
-        if (CanMove)
+
+
+        if (CanMove || !WasHit)
         {
             _input = new Vector2(
                 x: SignZero(Input.GetAxisRaw(_horizontalAxis)),
@@ -104,33 +101,23 @@ public class PlayerController : MonoBehaviour
 
             if (CanShoot && Input.GetKey(_fireKey))
             {
-                
-                SwitchFireMode((int) SettingsManager.SelectedFireMode);
+                SwitchFireMode((int)SettingsManager.SelectedFireMode);
             }
-           
-            
+
+
         }
         else
         {
-            
-            if (WasHit)
-            {
-                transform.Rotate(GetFreeRotation(_gotHitRotationSpeed));
-            }
-            else
-            {
-                Vector3 rotation = RotatePlayerAfterHitting();
-                transform.Rotate(rotation);
-                MovePlayer(_input.y);
-            }
-
+            transform.Rotate(GetFreeRotation(_gotHitRotationSpeed));
         }
-        
+
 
 
         if (SettingsManager.InvisibleTankMode)
         {
-            _playerMesh.enabled = CanShoot ? false : true;
+            _playerMesh.enabled = !CanShoot || WasHit ? true : false;
+            _turretMesh.enabled = !CanShoot || WasHit ? true : false;
+            _playerTextMesh.enabled = !CanShoot || WasHit ? true : false;
         }
     }
 
@@ -139,17 +126,6 @@ public class PlayerController : MonoBehaviour
     {
         return Vector3.up * rotationInput * _freeRotationSpeed * Time.deltaTime;
     }
-
-    public IEnumerator GotHitRoutine()
-    {
-        CanMove = false;
-        yield return new WaitForSeconds(1f);
-        CanMove = true;
-        _isHitting = false;
-        WasHit = false;
-
-    }
-
     public Vector3 GetIntervalRotation(float rotationInput)
     {
         _rotateTimer -= Time.deltaTime;
@@ -160,20 +136,37 @@ public class PlayerController : MonoBehaviour
         _rotateTimer += _intervalRotationDelay;
         return Vector3.up * RotationInterval * rotationInput;
     }
-
-    public void GetHit(Collision col)
+    public IEnumerator GotHitRoutine()
     {
-        WasHit = true;
-        StartCoroutine(GotHitRoutine());
-        GettingHitByBullet(-col.contacts[0].normal);
-    }
+        CanMove = false;
+        yield return new WaitForSeconds(1f);
+        CanMove = true;
+        _isHitting = false;
+        WasHit = false;
 
+    }
+    public void GetHitInDirecTionFromBullet(Vector3 bulletDirection, Collision playerCollision)
+    {
+        Vector3 playerNormal = playerCollision.contacts[0].normal;
+        Vector3 lerpedVector = Vector3.Lerp(bulletDirection, -playerNormal, .5f);
+        WasHit = true;
+        StartCoroutine(InvincibleRoutine());
+        StartCoroutine(GotHitRoutine());
+        GettingHitByBullet(lerpedVector);
+
+
+    }
     public void StartCoroutineWhenHitting()
     {
         StartCoroutine(GotHitRoutine());
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
-
+    private IEnumerator InvincibleRoutine()
+    {
+        IsInvincible = true;
+        yield return new WaitForSeconds(2f);
+        IsInvincible = false;
+    }
     private Vector3 RotatePlayerAfterHitting()
     {
         if (_isHitting)
@@ -186,10 +179,6 @@ public class PlayerController : MonoBehaviour
     private void GettingHitByBullet(Vector3 dir)
     {
         transform.position = Vector3.Lerp(transform.position, transform.position + dir, .5f);
-    }
-    private bool TogglePlayerMesh()
-    {
-        return !IsPlayerMeshVisible;
     }
     private void SwitchFireMode(int fireMode)
     {
@@ -210,14 +199,11 @@ public class PlayerController : MonoBehaviour
             transform.position += transform.forward * _movementSpeed * Time.deltaTime;
         }
     }
-
-
     private void ShootNormalBullet()
     {
         _currentBullet = Instantiate(_bulletPrefab, _bulletSpawn.position, transform.rotation);
         _currentBullet.Player = this;
     }
-
     private float SignZero(float f)
     {
         return f > 0f ? 1f
@@ -225,24 +211,7 @@ public class PlayerController : MonoBehaviour
             : 0f;
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        /*
-        if (collision.gameObject.tag == "Bullet")
-        {
-            
-            if (collision.gameObject.GetComponent<BulletBehaviour>().Player != this)
-            {
-                //GettingHitByBullet(collision.contacts[0].normal);
-                StartCoroutine(GotHitRoutine());
-                collision.gameObject.GetComponent<BulletBehaviour>().Player.Score++;
-                Debug.Log("Enemy hit me" + collision.gameObject.GetComponent<BulletBehaviour>().Player.Score);
-                
-            }
-            Destroy(collision.gameObject);
-        }
-        */
-    }
+
     // --------------------------------------------------------------------------------------------
 }
 

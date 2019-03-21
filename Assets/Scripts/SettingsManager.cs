@@ -17,49 +17,55 @@ public class SettingsManager : MonoBehaviour
     }
 
     // --- Nested Classes ---------------------------------------------------------------------------------------------
+    [Serializable]
     public class Settings
     {
         public bool _freePlayerRotation = true;
         public bool _friendlyFire = true;
-        public bool _bouncyBullets;
         public bool _invisibleTankMode = false;
         public bool _canBulletsBeDirected;
         public FireModes _fireModes = FireModes.Straight;
+        [Range(2,24)] public int _playerRotationSteps = 12;
+        
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------    
-    private static Settings _settings;
+    [SerializeField] private Settings _settings;
 
     // --- Properties -------------------------------------------------------------------------------------------------
     public static bool FreePlayerRotation
     {
-        get { return _settings._freePlayerRotation; }
-        set { _settings._freePlayerRotation = value; }
+        get { return Instance._settings._freePlayerRotation; }
+        set { Instance._settings._freePlayerRotation = value; }
     }
     public static bool FriendlyFire
     {
-        get { return _settings._friendlyFire; }
-        set { _settings._friendlyFire = value; }
+        get { return Instance._settings._friendlyFire; }
+        set { Instance._settings._friendlyFire = value; }
     }
     public static bool BouncyBullets
     {
-        get { return _settings._bouncyBullets; }
-        set { _settings._bouncyBullets = SelectedFireMode == FireModes.Ricochet; }
+        get { return SelectedFireMode == FireModes.Ricochet || SelectedFireMode == FireModes.GuidedRicochet; }
     }
     public static bool InvisibleTankMode
     {
-        get { return _settings._invisibleTankMode; }
-        set { _settings._invisibleTankMode = value; }
+        get { return Instance._settings._invisibleTankMode; }
+        set { Instance._settings._invisibleTankMode = value; }
     }
     public static FireModes SelectedFireMode
     {
-        get { return _settings._fireModes; }
-        set { _settings._fireModes = value; }
+        get { return Instance._settings._fireModes; }
+        set { Instance._settings._fireModes = value; }
     }
     public static bool CanBulletsBeDirected
     {
         get { return SelectedFireMode == FireModes.Guided || SelectedFireMode == FireModes.GuidedRicochet; }
 
+    }
+    public static int PlayerRotationSteps
+    {
+        get { return Instance._settings._playerRotationSteps; }
+        set { Instance._settings._playerRotationSteps = value; }
     }
 
 
@@ -84,7 +90,6 @@ public class SettingsManager : MonoBehaviour
 
 
     }
-
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
 
