@@ -2,8 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using Neox.Helpers;
+
 public class BulletFactory : MonoBehaviour
 {
     public static BulletFactory Instance { get; private set; }
@@ -12,12 +11,17 @@ public class BulletFactory : MonoBehaviour
     // --- Nested Classes ---------------------------------------------------------------------------------------------
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField ]private List<GameObject> _bulletList;
-    
-	// --- Properties -------------------------------------------------------------------------------------------------
-    
-	// --- Unity Functions --------------------------------------------------------------------------------------------
-	private void Awake()
+    [SerializeField] private BulletBehaviour _bulletPrefab;
+    [SerializeField, Range(0, 100)] private int _bulletStartAmount = 2;
+    [SerializeField] private bool _allowGrowth = true;
+
+    private Queue<BulletBehaviour> _bullets;
+    private int _bulletCounter = 0;
+
+    // --- Properties -------------------------------------------------------------------------------------------------
+
+    // --- Unity Functions --------------------------------------------------------------------------------------------
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -27,27 +31,67 @@ public class BulletFactory : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(this);
+
+        CreateBullets();
+    }
+
+    private void CreateBullets()
+    {
+        _bullets = new Queue<BulletBehaviour>();
+
+        for (int i = 0; i < _bulletStartAmount; i++)
+        {
+            CreateBullet();
+        }
+    }
+
+    private void CreateBullet()
+    {
+        _bulletCounter++;
+        BulletBehaviour bullet = Instantiate(_bulletPrefab, this.transform, true);
+        bullet.name = $"Bullet_{_bulletCounter.ToString("D3")}";
+        bullet.transform.position = Vector3.one * 10;
+        bullet.gameObject.SetActive(false);
+        _bullets.Enqueue(bullet);
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public bool GetAFreeBullet(PlayerController player)
+
+
+    public static BulletBehaviour GetBullet()
     {
-        foreach(GameObject bullet in _bulletList)
-        {
-             if(!bullet.activeSelf)
-            {
-                bullet.GetComponent<BulletBehaviour>().Player = player;
-                bullet.transform.position = player.BulletSpawn.position;
-                bullet.transform.rotation = player.BulletSpawn.rotation;
-                bullet.SetActive(true);
-                return (true);
-            }
-        }
-        return false;
+        return Instance._GetBullet();
     }
-	// --- Protected/Private Methods ----------------------------------------------------------------------------------
-   
-	// --------------------------------------------------------------------------------------------
+
+    public static void ReturnBullet(BulletBehaviour bullet)
+    {
+        Instance._ReturnBullet(bullet);        
+    }
+
+    // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    private BulletBehaviour _GetBullet()
+    {
+        if (_bullets.Count == 0)
+        {
+            if (!_allowGrowth)
+                return null;
+
+            CreateBullet();
+        }
+
+        BulletBehaviour b = _bullets.Dequeue();
+        b.gameObject.SetActive(true);
+        return b;
+    }
+
+    private void _ReturnBullet(BulletBehaviour bullet)
+    {
+        bullet.gameObject.SetActive(false);
+        bullet.transform.position = Vector3.one * 10;
+        _bullets.Enqueue(bullet);
+    }
+
+    // --------------------------------------------------------------------------------------------
 }
 
 // **************************************************************************************************************************************************

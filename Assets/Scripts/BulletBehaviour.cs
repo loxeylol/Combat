@@ -52,7 +52,7 @@ public class BulletBehaviour : MonoBehaviour, IHittable
     {
         IHittable hitable = collision.gameObject.GetComponent<IHittable>();
         if (hitable != null)
-        {            
+        {
             hitable.OnHit(this, collision);
             Explode();
             return;
@@ -85,11 +85,12 @@ public class BulletBehaviour : MonoBehaviour, IHittable
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
     void IHittable.OnHit(BulletBehaviour bullet, Collision collision)
     {
-        Explode();
+        // Calling expolde here will cause Explode to be called twice
+        //Explode();
     }
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
-    
+
     private void ApplyPlayerRotation()
     {
         transform.Rotate(Vector3.up, Player.RotationInput * _rotationSpeed * Time.deltaTime);
@@ -102,7 +103,10 @@ public class BulletBehaviour : MonoBehaviour, IHittable
 
     private void Explode()
     {
-        gameObject.SetActive(false);
+
+        Player.ClearBullet();
+        Player = null;
+        BulletFactory.ReturnBullet(this);
     }
 
     // --------------------------------------------------------------------------------------------

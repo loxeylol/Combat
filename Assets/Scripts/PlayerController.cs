@@ -115,7 +115,8 @@ public class PlayerController : MonoBehaviour, IHittable
         //    transform.Rotate(GetFreeRotation(_hitRotationSpeed));
         //}
 
-        if (CanShoot && Input.GetKeyDown(_fireKey))
+        //if (CanShoot && Input.GetKey(_fireKey))
+        if (Input.GetKeyDown(_fireKey))
         {
             FireWithMode(SettingsManager.SelectedFireMode);
         }
@@ -148,13 +149,18 @@ public class PlayerController : MonoBehaviour, IHittable
         StartCoroutine(GotHitRoutine(inBetweenDirection));
     }
 
+    public void ClearBullet()
+    {
+        _currentBullet = null;
+    }
+
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
-    public Vector3 GetFreeRotation(float rotationSpeed)
+    private Vector3 GetFreeRotation(float rotationSpeed)
     {
         return Vector3.up * rotationSpeed * Time.deltaTime;
     }
 
-    public Vector3 GetIntervalRotation(float rotationInput)
+    private Vector3 GetIntervalRotation(float rotationInput)
     {
         _rotateTimer -= Time.deltaTime;
 
@@ -214,13 +220,10 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void FireStraight()
     {
-        //_currentBullet = Instantiate(_bulletPrefab, _bulletSpawn.position, transform.rotation);
-        // _currentBullet.Player = this;
-        
-            BulletFactory.Instance.GetAFreeBullet(this);
-        
-        
-       
+        _currentBullet = BulletFactory.GetBullet();
+        _currentBullet.Player = this;
+        _currentBullet.transform.position = _bulletSpawn.position;
+        _currentBullet.transform.rotation = transform.rotation;
     }
 
     private float SignZero(float f)
