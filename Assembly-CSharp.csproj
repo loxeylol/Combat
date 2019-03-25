@@ -61,7 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BulletBehaviour.cs" />
+    <Compile Include="Assets\Scripts\BulletFactory.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\IHittable.cs" />
     <Compile Include="Assets\Scripts\LevelBounds.cs" />
     <Compile Include="Assets\Scripts\MenuButtonListener.cs" />
     <Compile Include="Assets\Scripts\MenuUi.cs" />

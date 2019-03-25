@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+    public static GameController gameController;
     // --- Enums ------------------------------------------------------------------------------------------------------
 
     // --- Nested Classes ---------------------------------------------------------------------------------------------
@@ -21,7 +22,6 @@ public class GameController : MonoBehaviour
     private bool SceneChanged { get; set; }
     public int FirstPlayerScore => _playerOne.Score;
     public int SecondPlayerScore => _playerTwo.Score;
-    public static GameController gameController;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -67,10 +67,6 @@ public class GameController : MonoBehaviour
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void GetPlayerControllers()
     {
-        if (SceneChanged)
-        {
-            return;
-        }
         SceneChanged = true;
         _playerOne = GameObject.Find("Player1").GetComponent<PlayerController>();
         _playerTwo = GameObject.Find("Player2").GetComponent<PlayerController>();
@@ -91,8 +87,8 @@ public class GameController : MonoBehaviour
     {
         _combinedScorePlayerOne += FirstPlayerScore;
         _combinedScorePlayerTwo += SecondPlayerScore;
-        ResetScore();
-        Debug.Log(_combinedScorePlayerOne + "CombinedScorePlayerOne");
+        //ResetScore();
+        Debug.Log(_combinedScorePlayerOne + "CombinedScorePlayerOne" + "CombinedScorePlayerTwo: " + _combinedScorePlayerTwo);
 
     }
     private void ResetScore()

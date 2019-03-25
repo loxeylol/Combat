@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IHittable
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
 
@@ -22,110 +22,138 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool _rotateFree;
     [SerializeField, Range(0, 720)] private int _freeRotationSpeed;
     [SerializeField, Range(0f, 1f)] private float _intervalRotationDelay = .25f;
-    [SerializeField] private float _gotHitRotationSpeed = 20;
 
     [Header("Bullet and Spawner")]
     [SerializeField] private BulletBehaviour _bulletPrefab;
     [SerializeField] private Transform _bulletSpawn;
 
+    [Header("Knockback")]
+    [SerializeField, Range(0f, 2f)] private float _knockbackDuration = 1f;
+    [SerializeField, Range(0f, 20f)] private float _knockbackPower = 5f;
+    [SerializeField] private InterpolationTypes _knockbackInterpolation;
+    [SerializeField] private int _hitRotationSpeed = 360;
+
     private BoxCollider _collider;
     private Rigidbody _rb;
-    private MeshRenderer _playerMesh;
-    [SerializeField] private MeshRenderer _turretMesh;
-    [SerializeField] private MeshRenderer _playerTextMesh;
+    private MeshRenderer[] _meshRenderers;
     private BulletBehaviour _currentBullet;
-
-
-
 
     private Vector2 _input;
     private Vector3 _startPos;
 
     private bool _isHitting;
-    private bool _canShoot;
     private float _bulletTimer;
     private float _rotateTimer;
+
+    private int _score = 0;
+    public Action<int> scoreChanged;
 
     private const float MIN_SPEED = 1f;
     private const float MAX_SPEED = 20f;
 
     // --- Properties -------------------------------------------------------------------------------------------------
-    public delegate void PlayerScoreDelegate(int score);
-    public PlayerScoreDelegate getScore;
     public bool IsInvincible { get; set; }
-    public bool WasHit { get; set; }
     public bool CanMove { get; set; }
-    public bool IsPlayerMeshVisible { get => !SettingsManager.InvisibleTankMode; }
-    //for bullet rotation
+    //for bullet rotation and spawn
+    public Transform BulletSpawn { get => _bulletSpawn; }
     public float RotationInput { get { return _input.x; } }
-    public int Score { get; set; }
+    public int Score
+    {
+        get { return _score; }
+        set
+        {
+            _score = value;
+            scoreChanged?.Invoke(_score);
+        }
+    }
     private float RotationInterval { get { return 360f / SettingsManager.PlayerRotationSteps; } }
     private float Speed { get { return _movementSpeed; } set { _movementSpeed = Mathf.Clamp(value, MIN_SPEED, MAX_SPEED); } }
-    private bool CanShoot { get { return _currentBullet == null; } }
+    private bool CanShoot { get { return CanMove && _currentBullet == null; } }
+
+    private bool IsInvisible
+    {
+        get { return _meshRenderers[0].enabled; }
+        set
+        {
+            foreach (MeshRenderer mr in _meshRenderers)
+                mr.enabled = !value;
+        }
+    }
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
-
         _collider = GetComponent<BoxCollider>();
         _rb = GetComponent<Rigidbody>();
-        _playerMesh = GetComponent<MeshRenderer>();
+        _meshRenderers = GetComponentsInChildren<MeshRenderer>(true);
 
         IsInvincible = false;
-        _playerMesh.enabled = IsPlayerMeshVisible ? true : false;
-        _turretMesh.enabled = IsPlayerMeshVisible ? true : false;
-        _playerTextMesh.enabled = IsPlayerMeshVisible ? true : false;
+        IsInvisible = SettingsManager.InvisibleTankMode;
         _rotateTimer = 0f;
         _bulletTimer = 0f;
         CanMove = true;
-        _canShoot = true;
     }
 
     private void Update()
     {
-
-
-        if (CanMove || !WasHit)
+        if (CanMove)
         {
             _input = new Vector2(
                 x: SignZero(Input.GetAxisRaw(_horizontalAxis)),
                 y: SignZero(Input.GetAxisRaw(_verticalAxis)));
 
             Vector3 rotation = SettingsManager.FreePlayerRotation
-                ? GetFreeRotation(_input.x)
+                ? GetFreeRotation(_input.x * _freeRotationSpeed)
                 : GetIntervalRotation(_input.x);
 
             transform.Rotate(rotation);
 
             MovePlayer(_input.y);
-
-            if (CanShoot && Input.GetKey(_fireKey))
-            {
-                SwitchFireMode((int)SettingsManager.SelectedFireMode);
-            }
-
-
         }
-        else
+        //else
+        //{
+        //    transform.Rotate(GetFreeRotation(_hitRotationSpeed));
+        //}
+
+        if (CanShoot && Input.GetKeyDown(_fireKey))
         {
-            transform.Rotate(GetFreeRotation(_gotHitRotationSpeed));
+            FireWithMode(SettingsManager.SelectedFireMode);
         }
-
-
 
         if (SettingsManager.InvisibleTankMode)
         {
-            _playerMesh.enabled = !CanShoot || WasHit ? true : false;
-            _turretMesh.enabled = !CanShoot || WasHit ? true : false;
-            _playerTextMesh.enabled = !CanShoot || WasHit ? true : false;
+            IsInvisible = CanShoot == false || CanMove == false;
         }
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public Vector3 GetFreeRotation(float rotationInput)
+    void IHittable.OnHit(BulletBehaviour bullet, Collision collision)
     {
-        return Vector3.up * rotationInput * _freeRotationSpeed * Time.deltaTime;
+        if (IsInvincible)
+            return;
+
+        if (bullet.Player == this && SettingsManager.FriendlyFire)
+        {
+            Score--;
+        }
+        else
+        {
+            bullet.Player.Score++;
+        }
+
+        Vector3 playerNormal = collision.contacts[0].normal;
+        Vector3 inBetweenDirection = (bullet.transform.forward + -playerNormal) / 2;
+        Debug.DrawRay(playerNormal, inBetweenDirection, Color.red);
+
+        StartCoroutine(GotHitRoutine(inBetweenDirection));
     }
+
+    // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    public Vector3 GetFreeRotation(float rotationSpeed)
+    {
+        return Vector3.up * rotationSpeed * Time.deltaTime;
+    }
+
     public Vector3 GetIntervalRotation(float rotationInput)
     {
         _rotateTimer -= Time.deltaTime;
@@ -136,62 +164,46 @@ public class PlayerController : MonoBehaviour
         _rotateTimer += _intervalRotationDelay;
         return Vector3.up * RotationInterval * rotationInput;
     }
-    public IEnumerator GotHitRoutine()
+
+    // --------------------------------------------------------------------------------------------
+    private IEnumerator GotHitRoutine(Vector3 direction)
     {
         CanMove = false;
-        yield return new WaitForSeconds(1f);
-        CanMove = true;
-        _isHitting = false;
-        WasHit = false;
-
-    }
-    public void GetHitInDirecTionFromBullet(Vector3 bulletDirection, Collision playerCollision)
-    {
-        Vector3 playerNormal = playerCollision.contacts[0].normal;
-        Vector3 lerpedVector = Vector3.Lerp(bulletDirection, -playerNormal, .5f);
-        WasHit = true;
-        StartCoroutine(InvincibleRoutine());
-        StartCoroutine(GotHitRoutine());
-        GettingHitByBullet(lerpedVector);
-
-
-    }
-    public void StartCoroutineWhenHitting()
-    {
-        StartCoroutine(GotHitRoutine());
-    }
-    // --- Protected/Private Methods ----------------------------------------------------------------------------------
-    private IEnumerator InvincibleRoutine()
-    {
         IsInvincible = true;
-        yield return new WaitForSeconds(2f);
+
+        float startTime = Time.time;
+        float t = 0f;
+
+        float startRotation = transform.rotation.y;
+        float endRotation = startRotation + (_hitRotationSpeed * _knockbackDuration);
+
+        while (t < 1f)
+        {
+            t = (Time.time - startTime) / _knockbackDuration;
+            float rot = NeoxMath.Lerp(startRotation, endRotation, t, _knockbackInterpolation);
+            transform.rotation = Quaternion.Euler(0f, rot, 0f);
+            float power = NeoxMath.Lerp(_knockbackPower, 0f, t, _knockbackInterpolation);
+            transform.position += direction * power * Time.deltaTime;
+
+            yield return null;
+        }
+
+        CanMove = true;
+        yield return new WaitForSeconds(1f);
         IsInvincible = false;
     }
-    private Vector3 RotatePlayerAfterHitting()
-    {
-        if (_isHitting)
-        {
-            return Vector3.zero;
-        }
-        _isHitting = true;
-        return Vector3.up * 45;
-    }
-    private void GettingHitByBullet(Vector3 dir)
-    {
-        transform.position = Vector3.Lerp(transform.position, transform.position + dir, .5f);
-    }
-    private void SwitchFireMode(int fireMode)
+
+    private void FireWithMode(FireModes fireMode)
     {
         switch (fireMode)
         {
-            case 0:
-                ShootNormalBullet();
-                break;
+            case FireModes.Straight:
             default:
-                ShootNormalBullet();
+                FireStraight();
                 break;
         }
     }
+
     private void MovePlayer(float input)
     {
         if (input > 0f)
@@ -199,11 +211,18 @@ public class PlayerController : MonoBehaviour
             transform.position += transform.forward * _movementSpeed * Time.deltaTime;
         }
     }
-    private void ShootNormalBullet()
+
+    private void FireStraight()
     {
-        _currentBullet = Instantiate(_bulletPrefab, _bulletSpawn.position, transform.rotation);
-        _currentBullet.Player = this;
+        //_currentBullet = Instantiate(_bulletPrefab, _bulletSpawn.position, transform.rotation);
+        // _currentBullet.Player = this;
+        
+            BulletFactory.Instance.GetAFreeBullet(this);
+        
+        
+       
     }
+
     private float SignZero(float f)
     {
         return f > 0f ? 1f
@@ -212,7 +231,9 @@ public class PlayerController : MonoBehaviour
     }
 
 
+
     // --------------------------------------------------------------------------------------------
 }
+
 
 // **************************************************************************************************************************************************

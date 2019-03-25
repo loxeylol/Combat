@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class BulletBehaviour : MonoBehaviour
+public class BulletBehaviour : MonoBehaviour, IHittable
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ public class BulletBehaviour : MonoBehaviour
     private SphereCollider _col;
     private LevelBounds _wall;
     private Rigidbody _rb;
-    
+
 
     // --- Properties -------------------------------------------------------------------------------------------------
     public PlayerController Player { get; set; }
@@ -31,8 +31,8 @@ public class BulletBehaviour : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<SphereCollider>();
-        Destroy(this.gameObject, _lifeTime);
-       
+        //Destroy(this.gameObject, _lifeTime);
+
     }
 
     private void Update()
@@ -47,9 +47,49 @@ public class BulletBehaviour : MonoBehaviour
         Debug.DrawRay(transform.position, transform.forward, Color.green);
     }
 
+    // --------------------------------------------------------------------------------------------
+    private void OnCollisionEnter(Collision collision)
+    {
+        IHittable hitable = collision.gameObject.GetComponent<IHittable>();
+        if (hitable != null)
+        {            
+            hitable.OnHit(this, collision);
+            Explode();
+            return;
+        }
+
+        //PlayerController hitPlayer = collision.gameObject.GetComponent<PlayerController>();
+        //if (hitPlayer != null)
+        //{
+        //    if (!hitPlayer.IsInvincible && (hitPlayer != Player || SettingsManager.FriendlyFire))
+        //    {
+        //        Player.Score += Player == hitPlayer ? -1 : +1;
+        //        hitPlayer.GetHitInDirecTionFromBullet(transform.forward, collision);
+        //    }
+
+        //    Destroy(gameObject);
+        //}
+
+        if (!SettingsManager.BouncyBullets)
+        {
+            Explode();
+            return;
+        }
+
+        // Reflect
+        Vector3 newDir = Vector3.Reflect(transform.forward, collision.GetContact(0).normal);
+        newDir.y = 0f;
+        transform.forward = newDir.normalized;
+    }
+
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
+    void IHittable.OnHit(BulletBehaviour bullet, Collision collision)
+    {
+        Explode();
+    }
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    
     private void ApplyPlayerRotation()
     {
         transform.Rotate(Vector3.up, Player.RotationInput * _rotationSpeed * Time.deltaTime);
@@ -60,40 +100,9 @@ public class BulletBehaviour : MonoBehaviour
         transform.position += transform.forward * _speed * Time.deltaTime;
     }
 
-
-    private void OnCollisionEnter(Collision collision)
+    private void Explode()
     {
-        PlayerController hitPlayer = collision.gameObject.GetComponent<PlayerController>();
-        if (hitPlayer != null)
-        {
-            if (hitPlayer != Player || SettingsManager.FriendlyFire)
-            {
-                if (!hitPlayer.IsInvincible)
-                {
-                    Player.Score += Player == hitPlayer ? -1 : +1;
-                    
-                    Player.StartCoroutineWhenHitting();
-                    //hitPlayer.GetHit(collision);
-                    hitPlayer.GetHitInDirecTionFromBullet(transform.forward, collision);
-                }
-                
-            }
-            Destroy(gameObject);
-        }
-        
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            if (!SettingsManager.BouncyBullets)
-            {
-                Destroy(this.gameObject);
-                return;
-            }
-
-            Vector3 newDir = Vector3.Reflect(transform.forward, collision.GetContact(0).normal);
-            newDir.y = 0f;
-            transform.forward = newDir.normalized;
-        }
-
+        gameObject.SetActive(false);
     }
 
     // --------------------------------------------------------------------------------------------

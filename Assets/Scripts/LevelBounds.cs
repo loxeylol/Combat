@@ -36,12 +36,12 @@ public class LevelBounds : MonoBehaviour
             
             Vector3 playerpos = player.gameObject.transform.position;
             
-            if (_isHorizontalBorder && !player.CanMove && player.WasHit )
+            if (_isHorizontalBorder && !player.CanMove/* && player.WasHit*/ )
             {
                 playerpos.x = playerpos.x > 0 ? -playerpos.x + _offset : -playerpos.x - _offset;
                 collision.gameObject.transform.position = playerpos;
             }
-            else if (!player.CanMove && player.WasHit)
+            else if (!player.CanMove/* && player.WasHit*/)
             {
                 playerpos.z = playerpos.z > 0 ? -playerpos.z + _offset : -playerpos.z - _offset;
                 collision.gameObject.transform.position = playerpos;

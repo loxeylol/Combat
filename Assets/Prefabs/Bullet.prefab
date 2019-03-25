@@ -108,7 +108,6 @@ MonoBehaviour:
   _speed: 7
   _lifeTime: 2
   _canBeDirected: 0
-  _canBounce: 1
   _rotationSpeed: 90
 --- !u!54 &2403583354941286223
 Rigidbody:

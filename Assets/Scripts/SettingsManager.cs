@@ -3,18 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum FireModes
+{
+    Straight = 0,
+    Ricochet = 1,
+    Guided = 2,
+    GuidedRicochet = 3
+}
+
 public class SettingsManager : MonoBehaviour
 {
     public static SettingsManager Instance { get; private set; }
 
     // --- Enums ------------------------------------------------------------------------------------------------------
-    public enum FireModes
-    {
-        Straight = 0,
-        Ricochet = 1,
-        Guided = 2,
-        GuidedRicochet = 3
-    }
+
 
     // --- Nested Classes ---------------------------------------------------------------------------------------------
     [Serializable]
@@ -25,8 +27,8 @@ public class SettingsManager : MonoBehaviour
         public bool _invisibleTankMode = false;
         public bool _canBulletsBeDirected;
         public FireModes _fireModes = FireModes.Straight;
-        [Range(2,24)] public int _playerRotationSteps = 12;
-        
+        [Range(2, 24)] public int _playerRotationSteps = 12;
+
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------    

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
+[RequireComponent(typeof(PlayerController))]
 public class PlayerUi : MonoBehaviour
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
@@ -21,14 +21,15 @@ public class PlayerUi : MonoBehaviour
     private void Awake()
     {
         _player = gameObject.GetComponent<PlayerController>();
-
-        //_playerLabel = gameObject.GetComponentInChildren<Text>();
+        _player.scoreChanged += (score) => _playerLabel.text = score.ToString();
     }
 
-    private void Update()
-    {
-        _playerLabel.text = "" + _player.Score;
-    }
+   
+
+    //private void Update()
+    //{
+    //    _playerLabel.text = _player.Score.ToString();
+    //}
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 

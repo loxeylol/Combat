@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,22 +29,21 @@ public class MenuUi : MonoBehaviour
         _toggleFriendlyFire.isOn = SettingsManager.FriendlyFire;
         _toggleFreePlayerRotation.isOn = SettingsManager.FreePlayerRotation;
         _playerRotationStepsSlider.value = SettingsManager.PlayerRotationSteps;
+
+        _dropDown.ClearOptions();
+        _dropDown.AddOptions(Enum.GetNames(typeof(FireModes)).ToList());
+        _dropDown.value = (int)SettingsManager.SelectedFireMode;
+
+        _toggleFriendlyFire.onValueChanged.AddListener(state => SettingsManager.FriendlyFire = state);
+        _toggleFreePlayerRotation.onValueChanged.AddListener(state => SettingsManager.FreePlayerRotation = state);
+        _toggleInvisibleTankMode.onValueChanged.AddListener(state => SettingsManager.InvisibleTankMode = state);
         _playerRotationStepsSlider.onValueChanged.AddListener(OnSliderValueChanged);
+        _dropDown.onValueChanged.AddListener(state => SettingsManager.SelectedFireMode = (FireModes)state);
+
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public void OnDropDownSelect()
-    {
-        SettingsManager.SelectedFireMode = (SettingsManager.FireModes)_dropDown.value;
-    }
-    public void OnToggledListener()
-    {
 
-        SettingsManager.FreePlayerRotation = _toggleFreePlayerRotation.isOn;
-        SettingsManager.FriendlyFire = _toggleFriendlyFire.isOn;
-        SettingsManager.InvisibleTankMode = _toggleInvisibleTankMode.isOn;
-
-    }
     public void OnSliderValueChanged(float a)
     {
         SettingsManager.PlayerRotationSteps = (int)a;
