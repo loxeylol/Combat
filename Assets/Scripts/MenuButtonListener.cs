@@ -26,7 +26,7 @@ public class MenuButtonListener : MonoBehaviour
 	// --- Protected/Private Methods ----------------------------------------------------------------------------------
     void OnStartGameButtonClicked()
     {
-        GameController.gameController.LoadNextLevel();
+        GameController.Instance.LoadNextLevel();
     }
     
 	// --------------------------------------------------------------------------------------------

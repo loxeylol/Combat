@@ -7,79 +7,124 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
-    public static GameController gameController;
+    public static GameController Instance;
     // --- Enums ------------------------------------------------------------------------------------------------------
 
     // --- Nested Classes ---------------------------------------------------------------------------------------------
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField, Range(2, 20)] private int _maxScore;
     [SerializeField] private PlayerController _playerOne;
     [SerializeField] private PlayerController _playerTwo;
+
     private int _combinedScorePlayerOne, _combinedScorePlayerTwo;
+
 
     // --- Properties -------------------------------------------------------------------------------------------------
     private bool SceneChanged { get; set; }
     public int FirstPlayerScore => _playerOne.Score;
     public int SecondPlayerScore => _playerTwo.Score;
+    public float GameTimer
+    {
+        get; set;
+    }
+
+    public int SelectedLevel
+    {
+        get; set;
+    }
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
-
-        SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
-
-        if (gameController == null)
+        if (Instance == null)
         {
-            gameController = this;
+            Instance = this;
         }
-        else if (gameController != this)
+        else if (Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
         DontDestroyOnLoad(gameObject);
+
+        SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
+        ResetGameStats();
+        SettingsManager.LevelRange = SceneManager.sceneCountInBuildSettings - 1;
     }
 
     private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
     {
+        Debug.Log("Active scene changed");
         GetPlayerControllers();
     }
 
     private void Update()
     {
-        CheckMaxScore();
+        if (SettingsManager.IsThereTimeLimit)
+        {
+            CheckGameTimer();
+        }
+        else
+        {
+            CheckMaxScore();
+        }
     }
 
-
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
+    public void LoadLevelWithIndex(int index)
+    {
+
+        if (SceneManager.GetSceneByBuildIndex(index) != null)
+        {
+            SceneManager.LoadSceneAsync(index, LoadSceneMode.Single);
+        }
+    }
     public void LoadNextLevel()
     {
+        Debug.Log("Load Next level");
         if (!SceneChanged)
         {
             return;
         }
+
         SceneChanged = false;
         SetCombinedScore();
-        int currentScene = SceneManager.GetActiveScene().buildIndex;
-        if (currentScene < SceneManager.sceneCountInBuildSettings - 1)
-            SceneManager.LoadScene(currentScene += 1);
+        ResetGameStats();
+
+        int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
+        if (nextScene < SceneManager.sceneCountInBuildSettings)
+            SceneManager.LoadScene(nextScene);
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void GetPlayerControllers()
     {
         SceneChanged = true;
-        _playerOne = GameObject.Find("Player1").GetComponent<PlayerController>();
-        _playerTwo = GameObject.Find("Player2").GetComponent<PlayerController>();
+        if (SceneManager.GetActiveScene() != SceneManager.GetSceneByBuildIndex(0))
+        {
+            _playerOne = GameObject.Find("Player1").GetComponent<PlayerController>();
+            _playerTwo = GameObject.Find("Player2").GetComponent<PlayerController>();
+        }
     }
-    private void CheckMaxScore()
+    private void CheckGameTimer()
     {
-
-        if (SecondPlayerScore >= _maxScore || FirstPlayerScore >= _maxScore)
+        GameTimer -= Time.deltaTime;
+        if (GameTimer <= 0)
         {
             string a = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
             Debug.Log(a);
             LoadNextLevel();
+        }
 
+    }
+    private void CheckMaxScore()
+    {
+        if (Mathf.Max(FirstPlayerScore, SecondPlayerScore) >= SettingsManager.MaxScore)
+        {
+            string winner = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
+            Debug.Log(winner);
+
+            LoadNextLevel();
         }
     }
 
@@ -87,14 +132,17 @@ public class GameController : MonoBehaviour
     {
         _combinedScorePlayerOne += FirstPlayerScore;
         _combinedScorePlayerTwo += SecondPlayerScore;
-        //ResetScore();
-        Debug.Log(_combinedScorePlayerOne + "CombinedScorePlayerOne" + "CombinedScorePlayerTwo: " + _combinedScorePlayerTwo);
+        Debug.Log(_combinedScorePlayerOne + "CombinedScorePlayerOne  -  CombinedScorePlayerTwo " + _combinedScorePlayerTwo);
 
     }
-    private void ResetScore()
+
+    private void ResetGameStats()
     {
-        _playerOne.Score = 0;
-        _playerTwo.Score = 0;
+        GameTimer = SettingsManager.GameTimer;
+        if (MonoFactory.Instance != null)
+        {
+            MonoFactory.ReturnAllChildren();
+        }
     }
 
     // --------------------------------------------------------------------------------------------

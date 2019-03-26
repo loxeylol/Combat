@@ -28,6 +28,11 @@ public class SettingsManager : MonoBehaviour
         public bool _canBulletsBeDirected;
         public FireModes _fireModes = FireModes.Straight;
         [Range(2, 24)] public int _playerRotationSteps = 12;
+        public int _maxScore = 10;
+        public float _gameTimer = 120;
+        public bool _isThereTimeLimit = false;
+        public int _levelRange;
+        public float _bulletLifeTime = 2;
 
     }
 
@@ -69,7 +74,31 @@ public class SettingsManager : MonoBehaviour
         get { return Instance._settings._playerRotationSteps; }
         set { Instance._settings._playerRotationSteps = value; }
     }
-
+    public static int MaxScore
+    {
+        get { return Instance._settings._maxScore; }
+        set { Instance._settings._maxScore = value; }
+    }
+    public static float GameTimer
+    {
+        get { return Instance._settings._gameTimer; }
+        set { Instance._settings._gameTimer = Mathf.Clamp(value, 0.3f, 2f) * 60; }
+    }
+    public static bool IsThereTimeLimit
+    {
+        get { return Instance._settings._isThereTimeLimit; }
+        set { Instance._settings._isThereTimeLimit = value; }
+    }
+    public static int LevelRange
+    {
+        get { return Instance._settings._levelRange; }
+        set { Instance._settings._levelRange = value; }
+    }
+    public static float BulletLifeTime
+    {
+        get { return Instance._settings._bulletLifeTime; }
+        set { Instance._settings._bulletLifeTime = Mathf.Clamp(value, 2f, 5f); }
+    }
 
 
 

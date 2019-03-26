@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class BulletBehaviour : MonoBehaviour, IHittable
+public class BulletBehaviour : MonoBehaviour, IHittable, IFactoryObject
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
 
@@ -13,11 +13,11 @@ public class BulletBehaviour : MonoBehaviour, IHittable
 
     // --- Fields -----------------------------------------------------------------------------------------------------
     [SerializeField, Range(0f, 10f)] private float _speed = 7f;
-    [SerializeField, Range(0.1f, 5f)] private float _lifeTime = 2f;
 
     [SerializeField] private bool _canBeDirected = true;
     [SerializeField, Range(0, 360)] private int _rotationSpeed = 90;
 
+    
     private SphereCollider _col;
     private LevelBounds _wall;
     private Rigidbody _rb;
@@ -25,6 +25,7 @@ public class BulletBehaviour : MonoBehaviour, IHittable
 
     // --- Properties -------------------------------------------------------------------------------------------------
     public PlayerController Player { get; set; }
+    
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -32,7 +33,11 @@ public class BulletBehaviour : MonoBehaviour, IHittable
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<SphereCollider>();
         //Destroy(this.gameObject, _lifeTime);
+    }
 
+    private void OnEnable()
+    {
+        StartCoroutine(LifetimeRoutine());
     }
 
     private void Update()
@@ -58,18 +63,6 @@ public class BulletBehaviour : MonoBehaviour, IHittable
             return;
         }
 
-        //PlayerController hitPlayer = collision.gameObject.GetComponent<PlayerController>();
-        //if (hitPlayer != null)
-        //{
-        //    if (!hitPlayer.IsInvincible && (hitPlayer != Player || SettingsManager.FriendlyFire))
-        //    {
-        //        Player.Score += Player == hitPlayer ? -1 : +1;
-        //        hitPlayer.GetHitInDirecTionFromBullet(transform.forward, collision);
-        //    }
-
-        //    Destroy(gameObject);
-        //}
-
         if (!SettingsManager.BouncyBullets)
         {
             Explode();
@@ -89,7 +82,17 @@ public class BulletBehaviour : MonoBehaviour, IHittable
         //Explode();
     }
 
+    void IFactoryObject.ReturnToFactory()
+    {
+        Explode();
+    }
+
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    private IEnumerator LifetimeRoutine()
+    {
+        yield return new WaitForSeconds(SettingsManager.BulletLifeTime);
+        Explode();
+    }
 
     private void ApplyPlayerRotation()
     {
@@ -103,10 +106,12 @@ public class BulletBehaviour : MonoBehaviour, IHittable
 
     private void Explode()
     {
-
-        Player.ClearBullet();
-        Player = null;
-        BulletFactory.ReturnBullet(this);
+        if (Player != null)
+        {
+            Player.ClearBullet();
+            Player = null;
+        }
+        MonoFactory.ReturnFactoryObject(this);
     }
 
     // --------------------------------------------------------------------------------------------

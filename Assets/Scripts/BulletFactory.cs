@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// **************************************************************************************************************************************************
+
 public class BulletFactory : MonoBehaviour
 {
     public static BulletFactory Instance { get; private set; }
@@ -56,8 +58,6 @@ public class BulletFactory : MonoBehaviour
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-
-
     public static BulletBehaviour GetBullet()
     {
         return Instance._GetBullet();
@@ -65,10 +65,22 @@ public class BulletFactory : MonoBehaviour
 
     public static void ReturnBullet(BulletBehaviour bullet)
     {
-        Instance._ReturnBullet(bullet);        
+        Instance._ReturnBullet(bullet);
+    }
+    public static void ReturnAllChildren()
+    {
+        Instance._ReturnAllChildren();
     }
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    private void _ReturnAllChildren()
+    {
+        foreach (IFactoryObject returnable in GetComponentsInChildren<IFactoryObject>(false))
+        {
+            returnable.ReturnToFactory();
+        }
+    }
+
     private BulletBehaviour _GetBullet()
     {
         if (_bullets.Count == 0)
@@ -80,7 +92,7 @@ public class BulletFactory : MonoBehaviour
         }
 
         BulletBehaviour b = _bullets.Dequeue();
-        b.gameObject.SetActive(true);
+        b.gameObject.SetActive(true);        
         return b;
     }
 

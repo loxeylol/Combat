@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour, IHittable
     [SerializeField] private KeyCode _fireKey = KeyCode.Space;
 
     [Header("Movement Values")]
-    [SerializeField, Range(0f, 20f)] private float _movementSpeed;
+    [SerializeField, Range(0f, 2f)] private float _movementSpeed;
     [SerializeField] private bool _rotateFree;
     [SerializeField, Range(0, 720)] private int _freeRotationSpeed;
     [SerializeField, Range(0f, 1f)] private float _intervalRotationDelay = .25f;
@@ -48,8 +48,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private int _score = 0;
     public Action<int> scoreChanged;
 
-    private const float MIN_SPEED = 1f;
-    private const float MAX_SPEED = 20f;
+    private const float MIN_SPEED = 0f;
+    private const float MAX_SPEED = 2f;
 
     // --- Properties -------------------------------------------------------------------------------------------------
     public bool IsInvincible { get; set; }
@@ -110,13 +110,10 @@ public class PlayerController : MonoBehaviour, IHittable
 
             MovePlayer(_input.y);
         }
-        //else
-        //{
-        //    transform.Rotate(GetFreeRotation(_hitRotationSpeed));
-        //}
+
 
         //if (CanShoot && Input.GetKey(_fireKey))
-        if (Input.GetKeyDown(_fireKey))
+        if (Input.GetKeyDown(_fireKey)&& CanShoot)
         {
             FireWithMode(SettingsManager.SelectedFireMode);
         }
@@ -220,7 +217,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void FireStraight()
     {
-        _currentBullet = BulletFactory.GetBullet();
+        
+        _currentBullet = MonoFactory.GetFactoryObject<BulletBehaviour>();
         _currentBullet.Player = this;
         _currentBullet.transform.position = _bulletSpawn.position;
         _currentBullet.transform.rotation = transform.rotation;
