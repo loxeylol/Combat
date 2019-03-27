@@ -26,13 +26,13 @@ public class SettingsManager : MonoBehaviour
         public bool _friendlyFire = true;
         public bool _invisibleTankMode = false;
         public bool _canBulletsBeDirected;
-        public FireModes _fireModes = FireModes.Straight;
+        public FireModes _fireModes = FireModes.GuidedRicochet;
         [Range(2, 24)] public int _playerRotationSteps = 12;
         public int _maxScore = 10;
         public float _gameTimer = 120;
         public bool _isThereTimeLimit = false;
         public int _levelRange;
-        public float _bulletLifeTime = 2;
+        public float _bulletLifeTime = 4;
 
     }
 
@@ -97,7 +97,7 @@ public class SettingsManager : MonoBehaviour
     public static float BulletLifeTime
     {
         get { return Instance._settings._bulletLifeTime; }
-        set { Instance._settings._bulletLifeTime = Mathf.Clamp(value, 2f, 5f); }
+        set { Instance._settings._bulletLifeTime = value; }
     }
 
 

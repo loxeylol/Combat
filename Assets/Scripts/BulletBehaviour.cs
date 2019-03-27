@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class BulletBehaviour : MonoBehaviour, IHittable, IFactoryObject
+public class BulletBehaviour : Shootable
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
 
@@ -13,98 +13,56 @@ public class BulletBehaviour : MonoBehaviour, IHittable, IFactoryObject
 
     // --- Fields -----------------------------------------------------------------------------------------------------
     [SerializeField, Range(0f, 10f)] private float _speed = 7f;
-
-    [SerializeField] private bool _canBeDirected = true;
     [SerializeField, Range(0, 360)] private int _rotationSpeed = 90;
 
-    
     private SphereCollider _col;
-    private LevelBounds _wall;
     private Rigidbody _rb;
-
+    private AudioSource _fireSound;
 
     // --- Properties -------------------------------------------------------------------------------------------------
-    public PlayerController Player { get; set; }
-    
+    public override FactoryTypes ObjectType => FactoryTypes.Bullet;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<SphereCollider>();
-        //Destroy(this.gameObject, _lifeTime);
+        _fireSound = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
     {
         StartCoroutine(LifetimeRoutine());
+        _fireSound.Play();
     }
 
     private void Update()
     {
-        if (SettingsManager.CanBulletsBeDirected)
+        if (!GameController.Instance.IsPaused)
         {
-            ApplyPlayerRotation();
+
+            if (SettingsManager.CanBulletsBeDirected)
+            {
+                ApplyPlayerRotation();
+            }
+
+            Move();
         }
 
-        Move();
 
-        Debug.DrawRay(transform.position, transform.forward, Color.green);
+
     }
 
     // --------------------------------------------------------------------------------------------
-    private void OnCollisionEnter(Collision collision)
-    {
-        IHittable hitable = collision.gameObject.GetComponent<IHittable>();
-        if (hitable != null)
-        {
-            hitable.OnHit(this, collision);
-            Explode();
-            return;
-        }
-
-        if (!SettingsManager.BouncyBullets)
-        {
-            Explode();
-            return;
-        }
-
-        // Reflect
-        Vector3 newDir = Vector3.Reflect(transform.forward, collision.GetContact(0).normal);
-        newDir.y = 0f;
-        transform.forward = newDir.normalized;
-    }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    void IHittable.OnHit(BulletBehaviour bullet, Collision collision)
-    {
-        // Calling expolde here will cause Explode to be called twice
-        //Explode();
-    }
 
-    void IFactoryObject.ReturnToFactory()
-    {
-        Explode();
-    }
-
-    // --- Protected/Private Methods ----------------------------------------------------------------------------------
-    private IEnumerator LifetimeRoutine()
-    {
-        yield return new WaitForSeconds(SettingsManager.BulletLifeTime);
-        Explode();
-    }
-
-    private void ApplyPlayerRotation()
-    {
-        transform.Rotate(Vector3.up, Player.RotationInput * _rotationSpeed * Time.deltaTime);
-    }
-
-    private void Move()
+    public override void Move()
     {
         transform.position += transform.forward * _speed * Time.deltaTime;
     }
 
-    private void Explode()
+    public override void Explode()
     {
         if (Player != null)
         {
@@ -112,6 +70,23 @@ public class BulletBehaviour : MonoBehaviour, IHittable, IFactoryObject
             Player = null;
         }
         MonoFactory.ReturnFactoryObject(this);
+    }
+
+    public override void OnHit(Shootable bullet, Collision collision)
+    {
+        //nothing to do here
+    }
+
+    public override void ReturnToFactory()
+    {
+        Explode();
+    }
+
+
+    // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    private void ApplyPlayerRotation()
+    {
+        transform.Rotate(Vector3.up, Player.RotationInput * _rotationSpeed * Time.deltaTime);
     }
 
     // --------------------------------------------------------------------------------------------

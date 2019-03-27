@@ -17,12 +17,21 @@ public class GameController : MonoBehaviour
     [SerializeField] private PlayerController _playerTwo;
 
     private int _combinedScorePlayerOne, _combinedScorePlayerTwo;
-
+    private bool _isPaused;
 
     // --- Properties -------------------------------------------------------------------------------------------------
     private bool SceneChanged { get; set; }
     public int FirstPlayerScore => _playerOne.Score;
     public int SecondPlayerScore => _playerTwo.Score;
+    public bool IsPaused
+    {
+        get { return _isPaused; }
+        set
+        {
+            _isPaused = value;
+            Time.timeScale = _isPaused ? 0f : 1f;
+        }
+    }
     public float GameTimer
     {
         get; set;
@@ -47,7 +56,7 @@ public class GameController : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-
+        _isPaused = false;
         SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
         ResetGameStats();
         SettingsManager.LevelRange = SceneManager.sceneCountInBuildSettings - 1;
@@ -56,6 +65,7 @@ public class GameController : MonoBehaviour
     private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
     {
         Debug.Log("Active scene changed");
+        ResetGameStats();
         GetPlayerControllers();
     }
 
@@ -95,6 +105,12 @@ public class GameController : MonoBehaviour
         int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
         if (nextScene < SceneManager.sceneCountInBuildSettings)
             SceneManager.LoadScene(nextScene);
+        else
+            GameIsOver();
+    }
+    public void PauseGame()
+    {
+        IsPaused = !IsPaused;
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void GetPlayerControllers()
@@ -106,6 +122,7 @@ public class GameController : MonoBehaviour
             _playerTwo = GameObject.Find("Player2").GetComponent<PlayerController>();
         }
     }
+
     private void CheckGameTimer()
     {
         GameTimer -= Time.deltaTime;
@@ -127,7 +144,11 @@ public class GameController : MonoBehaviour
             LoadNextLevel();
         }
     }
-
+    private void GameIsOver()
+    {
+        string winner = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
+        Debug.Log(winner);
+    }
     private void SetCombinedScore()
     {
         _combinedScorePlayerOne += FirstPlayerScore;
@@ -139,6 +160,7 @@ public class GameController : MonoBehaviour
     private void ResetGameStats()
     {
         GameTimer = SettingsManager.GameTimer;
+        IsPaused = false;
         if (MonoFactory.Instance != null)
         {
             MonoFactory.ReturnAllChildren();

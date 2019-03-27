@@ -1,0 +1,2 @@
+C:\NeoxDev\Combat\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+C:\NeoxDev\Combat\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache

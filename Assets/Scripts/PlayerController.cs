@@ -37,12 +37,12 @@ public class PlayerController : MonoBehaviour, IHittable
     private Rigidbody _rb;
     private MeshRenderer[] _meshRenderers;
     private BulletBehaviour _currentBullet;
+    private AudioSource _playerHitSound;
 
     private Vector2 _input;
     private Vector3 _startPos;
 
-    private bool _isHitting;
-    private float _bulletTimer;
+    //private bool _isHitting;
     private float _rotateTimer;
 
     private int _score = 0;
@@ -86,16 +86,18 @@ public class PlayerController : MonoBehaviour, IHittable
         _collider = GetComponent<BoxCollider>();
         _rb = GetComponent<Rigidbody>();
         _meshRenderers = GetComponentsInChildren<MeshRenderer>(true);
-
+        _playerHitSound = GetComponent<AudioSource>();
         IsInvincible = false;
         IsInvisible = SettingsManager.InvisibleTankMode;
         _rotateTimer = 0f;
-        _bulletTimer = 0f;
         CanMove = true;
     }
 
     private void Update()
     {
+        if (GameController.Instance.IsPaused)
+            return;
+
         if (CanMove)
         {
             _input = new Vector2(
@@ -113,7 +115,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
 
         //if (CanShoot && Input.GetKey(_fireKey))
-        if (Input.GetKeyDown(_fireKey)&& CanShoot)
+        if (Input.GetKeyDown(_fireKey) && CanShoot)
         {
             FireWithMode(SettingsManager.SelectedFireMode);
         }
@@ -125,11 +127,11 @@ public class PlayerController : MonoBehaviour, IHittable
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    void IHittable.OnHit(BulletBehaviour bullet, Collision collision)
+    void IHittable.OnHit(Shootable bullet, Collision collision)
     {
         if (IsInvincible)
             return;
-
+        _playerHitSound.Play();
         if (bullet.Player == this && SettingsManager.FriendlyFire)
         {
             Score--;
@@ -143,6 +145,7 @@ public class PlayerController : MonoBehaviour, IHittable
         Vector3 inBetweenDirection = (bullet.transform.forward + -playerNormal) / 2;
         Debug.DrawRay(playerNormal, inBetweenDirection, Color.red);
 
+        bullet.Explode();
         StartCoroutine(GotHitRoutine(inBetweenDirection));
     }
 
@@ -217,8 +220,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void FireStraight()
     {
-        
-        _currentBullet = MonoFactory.GetFactoryObject<BulletBehaviour>();
+
+        _currentBullet = MonoFactory.GetFactoryObject<BulletBehaviour>(FactoryTypes.Bullet);
         _currentBullet.Player = this;
         _currentBullet.transform.position = _bulletSpawn.position;
         _currentBullet.transform.rotation = transform.rotation;

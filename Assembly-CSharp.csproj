@@ -62,11 +62,13 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\BulletBehaviour.cs" />
     <Compile Include="Assets\Scripts\BulletFactory.cs" />
+    <Compile Include="Assets\Scripts\FactoryObject.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\GameMenu.cs" />
     <Compile Include="Assets\Scripts\IFactoryObject.cs" />
     <Compile Include="Assets\Scripts\IHittable.cs" />
     <Compile Include="Assets\Scripts\LevelBounds.cs" />
+    <Compile Include="Assets\Scripts\LevelObject.cs" />
     <Compile Include="Assets\Scripts\MenuButtonListener.cs" />
     <Compile Include="Assets\Scripts\MenuUi.cs" />
     <Compile Include="Assets\Scripts\MonoFactory.cs" />
@@ -74,6 +76,8 @@
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\PlayerUi.cs" />
     <Compile Include="Assets\Scripts\SettingsManager.cs" />
+    <Compile Include="Assets\Scripts\Shootable.cs" />
+    <Compile Include="Assets\Scripts\SoundManager.cs" />
     <Compile Include="Assets\ScriptTemplates\ScriptTemplatesEditor.cs" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />

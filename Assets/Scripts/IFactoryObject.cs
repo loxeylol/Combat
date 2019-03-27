@@ -4,11 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum FactoryTypes
+{
+    Bullet = 0,
+    Grenade = 1,
+    DestructibleCube = 10
+}
+
 public interface IFactoryObject
 {
     // --- Events -----------------------------------------------------------------------------------------------------
 
     // --- Properties -------------------------------------------------------------------------------------------------
+    FactoryTypes ObjectType { get; }
 
     // --- Methods ----------------------------------------------------------------------------------------------------
     void ReturnToFactory();

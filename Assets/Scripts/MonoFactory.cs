@@ -18,14 +18,14 @@ public class MonoFactory : MonoBehaviour
         public MonoBehaviour prefab;
         [Range(0, 99)] public int startAmount = 10;
         public bool allowGrowth = true;
-        [HideInInspector] public Type type;
+        [HideInInspector] public FactoryTypes type;
         [HideInInspector] public Queue<IFactoryObject> queue;
 
         public int counter = 0;
 
         public void Populate()
         {
-            type = prefab.GetType();
+            type = (prefab as IFactoryObject).ObjectType;
             queue = new Queue<IFactoryObject>();
 
             for (int i = 0; i < startAmount; i++)
@@ -75,9 +75,9 @@ public class MonoFactory : MonoBehaviour
 #endif
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public static T GetFactoryObject<T>() where T : MonoBehaviour, IFactoryObject
+    public static T GetFactoryObject<T>(FactoryTypes type) where T : MonoBehaviour, IFactoryObject
     {
-        return Instance._GetFactoryObject<T>();
+        return Instance._GetFactoryObject<T>(type);
     }
 
     public static void ReturnFactoryObject<T>(T obj) where T : MonoBehaviour, IFactoryObject
@@ -126,7 +126,7 @@ public class MonoFactory : MonoBehaviour
     private void _ReturnFactoryObject<T>(T obj) where T : MonoBehaviour, IFactoryObject
     {
 
-        FactoryType ft = _factories.FirstOrDefault(f => f.type == typeof(T));
+        FactoryType ft = _factories.FirstOrDefault(f => f.type == obj.ObjectType);
         if (ft == null)
         {
             Debug.LogWarning($"Type {typeof(T).Name} does not exists in the factory.");
@@ -137,9 +137,10 @@ public class MonoFactory : MonoBehaviour
         obj.transform.position = Vector3.one * 10;
         ft.queue.Enqueue(obj);
     }
-    private T _GetFactoryObject<T>() where T : MonoBehaviour, IFactoryObject
+
+    private T _GetFactoryObject<T>(FactoryTypes type) where T : MonoBehaviour, IFactoryObject
     {
-        FactoryType ft = _factories.FirstOrDefault(f => f.type == typeof(T));
+        FactoryType ft = _factories.FirstOrDefault(f => f.type == type);
         if (ft == null)
         {
             Debug.LogWarning($"Type {typeof(T).Name} does not exists in the factory.");
