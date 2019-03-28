@@ -48,4 +48,10 @@ MonoBehaviour:
       type: 3}
     startAmount: 10
     allowGrowth: 0
+    type: 0
+    counter: 0
+  - prefab: {fileID: 989520081415848319, guid: b87384970f9235a4f926d705a99b202b, type: 3}
+    startAmount: 5
+    allowGrowth: 0
+    type: 0
     counter: 0

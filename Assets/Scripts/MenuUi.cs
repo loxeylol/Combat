@@ -21,7 +21,6 @@ public class MenuUi : MonoBehaviour
     [SerializeField] private Toggle _toggleInvisibleTankMode;
     [SerializeField] private Slider _playerRotationStepsSlider;
     [SerializeField] private Slider _maxScoreSlider;
-    [SerializeField] private Slider _timeLimitSlider;
     [SerializeField] private Button _toggleSettingsButton;
     [SerializeField] private GameObject _settingsContent;
     [SerializeField] private GameObject _menuContent;
@@ -31,7 +30,7 @@ public class MenuUi : MonoBehaviour
     [Header("Main Menu")]
     [SerializeField] private Button _backToMainMenuButton;
     [SerializeField] private Button _startGameButton;
-    private Text _playerRotationStepSliderText, _maxScoreSliderText, _timeLimitSliderText,_levelSelectSliderText;
+    private Text _playerRotationStepSliderText, _maxScoreSliderText, _timeLimitSliderText, _levelSelectSliderText;
     // --- Properties -------------------------------------------------------------------------------------------------
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
@@ -39,7 +38,6 @@ public class MenuUi : MonoBehaviour
     {
         _playerRotationStepSliderText = _playerRotationStepsSlider.GetComponentInChildren<Text>();
         _maxScoreSliderText = _maxScoreSlider.GetComponentInChildren<Text>();
-        _timeLimitSliderText = _timeLimitSlider.GetComponentInChildren<Text>();
         _levelSelectSliderText = _levelSelectSlider.GetComponentInChildren<Text>();
 
         _levelSelectSlider.wholeNumbers = true;
@@ -57,7 +55,6 @@ public class MenuUi : MonoBehaviour
         _levelSelectSliderText.text = _levelSelectSlider.value.ToString();
         _playerRotationStepSliderText.text = _playerRotationStepsSlider.value.ToString();
         _maxScoreSliderText.text = _maxScoreSlider.value.ToString();
-        _timeLimitSliderText.text = _timeLimitSlider.value.ToString();
 
         _fireModeDropDown.ClearOptions();
         _fireModeDropDown.AddOptions(Enum.GetNames(typeof(FireModes)).ToList());
@@ -71,32 +68,31 @@ public class MenuUi : MonoBehaviour
 
         _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         _toggleSettingsButton.onClick.AddListener(OnSettingsButtonClicked);
-        _backToMainMenuButton.onClick.AddListener(OnSettingsButtonClicked);
+        _backToMainMenuButton.onClick.AddListener(OnSettingsSaveAndGoBackButtonPressed);
 
         _levelSelectSlider.onValueChanged.AddListener(OnLevelSelectSliderValueChanged);
-        _timeLimitSlider.onValueChanged.AddListener(OnTimeLimitSliderChanged);
         _playerRotationStepsSlider.onValueChanged.AddListener(OnPlayerRotationSliderValueChanged);
         _maxScoreSlider.onValueChanged.AddListener(OnMaxScoreSliderValueChanged);
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
+    public void OnSettingsSaveAndGoBackButtonPressed()
+    {
+        SettingsManager.SaveSettings();
+        OnSettingsButtonClicked();
+    }
+
     public void OnPlayerRotationSliderValueChanged(float a)
     {
         SettingsManager.PlayerRotationSteps = (int)a;
         _playerRotationStepSliderText.text = _playerRotationStepsSlider.value.ToString();
     }
-    public void OnTimeLimitSliderChanged(float a)
-    {       
-        SettingsManager.GameTimer = a;
-        Debug.Log(SettingsManager.GameTimer);
-        GameController.Instance.GameTimer = SettingsManager.GameTimer;
-        _timeLimitSliderText.text = Math.Round(_timeLimitSlider.value, 1).ToString();
-    }
+
     public void OnLevelSelectSliderValueChanged(float a)
     {
         _levelSelectSliderText.text = a.ToString();
-        GameController.Instance.SelectedLevel =(int) a;
+        GameController.Instance.SelectedLevel = (int)a;
     }
     public void OnMaxScoreSliderValueChanged(float a)
     {

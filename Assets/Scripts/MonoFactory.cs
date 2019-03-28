@@ -20,8 +20,7 @@ public class MonoFactory : MonoBehaviour
         public bool allowGrowth = true;
         [HideInInspector] public FactoryTypes type;
         [HideInInspector] public Queue<IFactoryObject> queue;
-
-        public int counter = 0;
+        [HideInInspector] public int counter = 0;
 
         public void Populate()
         {
@@ -89,6 +88,11 @@ public class MonoFactory : MonoBehaviour
         Instance._ReturnAllChildren();
     }
 
+    public static T GetFactoryPrefab<T>(T obj) where T : MonoBehaviour, IFactoryObject
+    {
+        return Instance._GetFactoryPrefab(obj);
+    }
+
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void _ReturnAllChildren()
     {
@@ -125,7 +129,6 @@ public class MonoFactory : MonoBehaviour
     // --------------------------------------------------------------------------------------------
     private void _ReturnFactoryObject<T>(T obj) where T : MonoBehaviour, IFactoryObject
     {
-
         FactoryType ft = _factories.FirstOrDefault(f => f.type == obj.ObjectType);
         if (ft == null)
         {
@@ -160,7 +163,17 @@ public class MonoFactory : MonoBehaviour
         return obj;
     }
 
+    private T _GetFactoryPrefab<T>(T obj) where T : MonoBehaviour, IFactoryObject
+    {
+        FactoryType ft = _factories.FirstOrDefault(f => f.type == obj.ObjectType);
+        if (ft == null)
+        {
+            Debug.LogWarning($"Type {typeof(T).Name} does not exists in the factory.");
+            return null;
+        }
 
+        return ft.prefab as T;
+    }
 
     // --------------------------------------------------------------------------------------------
 }

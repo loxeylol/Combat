@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public enum FireModes
@@ -29,7 +30,7 @@ public class SettingsManager : MonoBehaviour
         public FireModes _fireModes = FireModes.GuidedRicochet;
         [Range(2, 24)] public int _playerRotationSteps = 12;
         public int _maxScore = 10;
-        public float _gameTimer = 120;
+        public float _gameTimer = 60;
         public bool _isThereTimeLimit = false;
         public int _levelRange;
         public float _bulletLifeTime = 4;
@@ -38,7 +39,11 @@ public class SettingsManager : MonoBehaviour
 
     // --- Fields -----------------------------------------------------------------------------------------------------    
     [SerializeField] private Settings _settings;
-
+    public PersistentData PersistentData
+    {
+        get;
+        private set;
+    }
     // --- Properties -------------------------------------------------------------------------------------------------
     public static bool FreePlayerRotation
     {
@@ -118,11 +123,17 @@ public class SettingsManager : MonoBehaviour
         DontDestroyOnLoad(this);
 
         _settings = new Settings();
+        PersistentData = new PersistentData();
 
-
+       
+        
     }
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-
+    public static void SaveSettings()
+    {
+        Instance.PersistentData.SetCurrentSettings(Instance._settings);
+        Instance.PersistentData.SaveData();
+    }
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
 

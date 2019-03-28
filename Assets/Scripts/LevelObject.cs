@@ -15,7 +15,10 @@ public class LevelObject : MonoBehaviour, IHittable
 
     // --- Fields -----------------------------------------------------------------------------------------------------
     private AudioSource _wallHitSound;
+
     // --- Properties -------------------------------------------------------------------------------------------------
+    public virtual bool ExplodeShootable => true;
+    public virtual bool ReflectShootable => true;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -25,18 +28,20 @@ public class LevelObject : MonoBehaviour, IHittable
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
-    public void OnHit(Shootable hittedObject, Collision collision)
+    public void OnHit(Shootable bullet, Collision collision)
     {
         _wallHitSound.Play();
-        if (!SettingsManager.BouncyBullets)
-        {
-            hittedObject.Explode();
-        }
-        hittedObject.Reflect(collision);
+        //if (!SettingsManager.BouncyBullets)
+        //{
+        //    bullet.Explode();
+        //}
+        //bullet.Reflect(collision);
     }
-	// --- Protected/Private Methods ----------------------------------------------------------------------------------
-    
-	// --------------------------------------------------------------------------------------------
+
+   
+    // --- Protected/Private Methods ----------------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------------------------
 }
 
 // **************************************************************************************************************************************************

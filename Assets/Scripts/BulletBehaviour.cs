@@ -15,52 +15,52 @@ public class BulletBehaviour : Shootable
     [SerializeField, Range(0f, 10f)] private float _speed = 7f;
     [SerializeField, Range(0, 360)] private int _rotationSpeed = 90;
 
-    private SphereCollider _col;
-    private Rigidbody _rb;
     private AudioSource _fireSound;
-
     // --- Properties -------------------------------------------------------------------------------------------------
     public override FactoryTypes ObjectType => FactoryTypes.Bullet;
+
+    public override Collider Col => GetComponent<SphereCollider>();
+    public override Rigidbody Rb => GetComponent<Rigidbody>();
+    public override AudioSource FireSound => GetComponent<AudioSource>();
+
+    public override int Rotationspeed => _rotationSpeed;
+
+    public override float Speed => _speed;
+
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
-        _rb = GetComponent<Rigidbody>();
-        _col = GetComponent<SphereCollider>();
-        _fireSound = GetComponent<AudioSource>();
+       
     }
 
     private void OnEnable()
     {
         StartCoroutine(LifetimeRoutine());
-        _fireSound.Play();
+        FireSound.Play();
     }
 
-    private void Update()
-    {
-        if (!GameController.Instance.IsPaused)
-        {
+    //private void Update()
+    //{
+    //    if (GameController.Instance.IsPaused)
+    //    {
+    //        return;
+    //    }
 
-            if (SettingsManager.CanBulletsBeDirected)
-            {
-                ApplyPlayerRotation();
-            }
+    //        if (SettingsManager.CanBulletsBeDirected)
+    //        {
+    //            ApplyPlayerRotation();
+    //        }
 
-            Move();
-        }
-
-
-
-    }
+    //        Move();
+        
+    //}
 
     // --------------------------------------------------------------------------------------------
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
-    public override void Move()
-    {
-        transform.position += transform.forward * _speed * Time.deltaTime;
-    }
+   
 
     public override void Explode()
     {
@@ -83,11 +83,9 @@ public class BulletBehaviour : Shootable
     }
 
 
+
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
-    private void ApplyPlayerRotation()
-    {
-        transform.Rotate(Vector3.up, Player.RotationInput * _rotationSpeed * Time.deltaTime);
-    }
+
 
     // --------------------------------------------------------------------------------------------
 }

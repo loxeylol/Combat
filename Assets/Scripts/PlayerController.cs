@@ -80,6 +80,9 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    public bool ExplodeShootable => true;
+    public bool ReflectShootable => false;
+
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
@@ -87,7 +90,6 @@ public class PlayerController : MonoBehaviour, IHittable
         _rb = GetComponent<Rigidbody>();
         _meshRenderers = GetComponentsInChildren<MeshRenderer>(true);
         _playerHitSound = GetComponent<AudioSource>();
-        IsInvincible = false;
         IsInvisible = SettingsManager.InvisibleTankMode;
         _rotateTimer = 0f;
         CanMove = true;
@@ -122,7 +124,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
         if (SettingsManager.InvisibleTankMode)
         {
-            IsInvisible = CanShoot == false || CanMove == false;
+            IsInvisible = CanShoot == true || CanMove == false;
         }
     }
 

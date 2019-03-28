@@ -58,7 +58,6 @@ public class GameController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         _isPaused = false;
         SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
-        ResetGameStats();
         SettingsManager.LevelRange = SceneManager.sceneCountInBuildSettings - 1;
     }
 

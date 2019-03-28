@@ -1,0 +1,16 @@
+{
+    "settings": {
+        "_freePlayerRotation": true,
+        "_friendlyFire": true,
+        "_invisibleTankMode": true,
+        "_canBulletsBeDirected": false,
+        "_fireModes": 3,
+        "_playerRotationSteps": 12,
+        "_maxScore": 10,
+        "_gameTimer": 60.0,
+        "_isThereTimeLimit": false,
+        "_levelRange": 4,
+        "_bulletLifeTime": 4.0
+    },
+    "highscore": 0
+}

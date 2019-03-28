@@ -8,7 +8,8 @@ public enum FactoryTypes
 {
     Bullet = 0,
     Grenade = 1,
-    DestructibleCube = 10
+    Cube = 10,
+    DestructibleCube = 11
 }
 
 public interface IFactoryObject
