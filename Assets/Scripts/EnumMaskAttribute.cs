@@ -4,30 +4,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-public class MenuButtonListener : MonoBehaviour
+public class EnumMaskAttribute : PropertyAttribute
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
 
-    // --- Nested Classes ---------------------------------------------------------------------------------------------
+	// --- Nested Classes ---------------------------------------------------------------------------------------------
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField] Button _startGameButton;
-	// --- Properties -------------------------------------------------------------------------------------------------
 
-	// --- Unity Functions --------------------------------------------------------------------------------------------
-	private void Awake()
+	// --- Properties -------------------------------------------------------------------------------------------------
+    public bool DrawAsList { get; private set; }
+
+	// --- Constructors -----------------------------------------------------------------------------------------------
+	public EnumMaskAttribute(bool drawAsList = false)
     {
-        _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
+        DrawAsList = drawAsList;
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
 	// --- Protected/Private Methods ----------------------------------------------------------------------------------
-    void OnStartGameButtonClicked()
-    {
-        GameController.Instance.LoadNextLevel();
-    }
     
 	// --------------------------------------------------------------------------------------------
 }

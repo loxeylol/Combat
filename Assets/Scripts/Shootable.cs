@@ -14,14 +14,15 @@ public abstract class Shootable : MonoBehaviour, IFactoryObject, IHittable
 
     // --- Fields -----------------------------------------------------------------------------------------------------
 
+    [SerializeField, Range(0f, 10f)] protected float _speed = 7f;
+    [SerializeField, Range(0, 360)] protected int _rotationSpeed = 90;
+    protected float _currentSpeed;
+    protected Coroutine _lifetimeRoutine;
 
     // --- Properties -------------------------------------------------------------------------------------------------
     public PlayerController Player { get; set; }
 
-
     public abstract FactoryTypes ObjectType { get; }
-    public abstract int Rotationspeed { get; }
-    public abstract float Speed { get; }
     public abstract Collider Col { get; }
     public abstract Rigidbody Rb { get; }
     public abstract AudioSource FireSound { get; }
@@ -30,10 +31,14 @@ public abstract class Shootable : MonoBehaviour, IFactoryObject, IHittable
     public virtual bool ReflectShootable => false;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
-    private void Awake()
+    protected virtual void OnEnable()
     {
+        _currentSpeed = _speed;
+        FireSound.Play();
 
+        _lifetimeRoutine = StartCoroutine(LifetimeRoutine());
     }
+
     protected virtual void Update()
     {
         if (GameController.Instance.IsPaused)
@@ -45,24 +50,12 @@ public abstract class Shootable : MonoBehaviour, IFactoryObject, IHittable
         {
             ApplyPlayerRotation();
         }
-        Debug.Log("Shootableupdate");
         Move();
 
     }
 
-    // --- Public/Internal Methods ------------------------------------------------------------------------------------
-
-    abstract public void OnHit(Shootable bullet, Collision collision);
-
-    abstract public void ReturnToFactory();
-
-    public IEnumerator LifetimeRoutine()
-    {
-        yield return new WaitForSeconds(SettingsManager.BulletLifeTime);
-
-        Explode();
-    }
-    public void OnCollisionEnter(Collision collision)
+    // --------------------------------------------------------------------------------------------
+    protected virtual void OnCollisionEnter(Collision collision)
     {
         IHittable hitable = collision.gameObject.GetComponent<IHittable>();
         if (hitable == null)
@@ -72,12 +65,25 @@ public abstract class Shootable : MonoBehaviour, IFactoryObject, IHittable
 
         if (SettingsManager.BouncyBullets && hitable.ReflectShootable)
         {
-            Reflect(collision);            
+            Reflect(collision);
         }
         else if (hitable.ExplodeShootable)
         {
             Explode();
         }
+    }
+
+    // --- Public/Internal Methods ------------------------------------------------------------------------------------
+    abstract public void OnHit(Shootable bullet, Collision collision);
+
+    virtual public void ReturnToFactory()
+    {
+        if (Player != null)
+        {
+            Player.ClearBullet();
+            Player = null;
+        }
+        MonoFactory.ReturnFactoryObject(this);
     }
 
     public void Reflect(Collision collision)
@@ -87,19 +93,26 @@ public abstract class Shootable : MonoBehaviour, IFactoryObject, IHittable
         transform.forward = newDir.normalized;
     }
 
+    // --- Protected/Private Methods ----------------------------------------------------------------------------------
     protected virtual void Move()
     {
-        transform.position += transform.forward * Speed * Time.deltaTime;
+        transform.position += transform.forward * _currentSpeed * Time.deltaTime;
     }
 
     protected virtual void ApplyPlayerRotation()
     {
-        transform.Rotate(Vector3.up, Player.RotationInput * Rotationspeed * Time.deltaTime);
+        transform.Rotate(Vector3.up, Player.RotationInput * _rotationSpeed * Time.deltaTime);
     }
-    abstract public void Explode();
+    abstract protected void Explode();
 
+    // --------------------------------------------------------------------------------------------
+    protected IEnumerator LifetimeRoutine()
+    {
+        yield return new WaitForSeconds(SettingsManager.BulletLifeTime);
+        Debug.Log("Lifetimeroutine Explode!");
+        Explode();
+    }
 
-    // --- Protected/Private Methods ----------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------
 }
 

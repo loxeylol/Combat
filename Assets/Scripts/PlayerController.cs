@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private BoxCollider _collider;
     private Rigidbody _rb;
     private MeshRenderer[] _meshRenderers;
-    private BulletBehaviour _currentBullet;
+    private Shootable _currentBullet;
     private AudioSource _playerHitSound;
 
     private Vector2 _input;
@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviour, IHittable
     //for bullet rotation and spawn
     public Transform BulletSpawn { get => _bulletSpawn; }
     public float RotationInput { get { return _input.x; } }
+    public KeyCode FireKey => _fireKey;
     public int Score
     {
         get { return _score; }
@@ -119,7 +120,7 @@ public class PlayerController : MonoBehaviour, IHittable
         //if (CanShoot && Input.GetKey(_fireKey))
         if (Input.GetKeyDown(_fireKey) && CanShoot)
         {
-            FireWithMode(SettingsManager.SelectedFireMode);
+            FireWithMode(SettingsManager.BulletType);
         }
 
         if (SettingsManager.InvisibleTankMode)
@@ -129,7 +130,7 @@ public class PlayerController : MonoBehaviour, IHittable
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    void IHittable.OnHit(Shootable bullet, Collision collision)
+    public void OnHit(Shootable bullet, Collision collision)
     {
         if (IsInvincible)
             return;
@@ -143,12 +144,19 @@ public class PlayerController : MonoBehaviour, IHittable
             bullet.Player.Score++;
         }
 
-        Vector3 playerNormal = collision.contacts[0].normal;
-        Vector3 inBetweenDirection = (bullet.transform.forward + -playerNormal) / 2;
-        Debug.DrawRay(playerNormal, inBetweenDirection, Color.red);
+        Vector3 collisionNormal;
+        if (collision != null)
+        {
+            collisionNormal = -collision.contacts[0].normal;            
+            //Debug.DrawRay(playerNormal, knockbackDirection, Color.red);
+        }
+        else
+        {
+            collisionNormal = (_collider.bounds.ClosestPoint(bullet.transform.position) - bullet.transform.position).normalized;
+        }
+        Vector3 knockbackDirection = (bullet.transform.forward + collisionNormal) / 2;
 
-        bullet.Explode();
-        StartCoroutine(GotHitRoutine(inBetweenDirection));
+        StartCoroutine(GotHitRoutine(knockbackDirection));
     }
 
     public void ClearBullet()
@@ -201,13 +209,16 @@ public class PlayerController : MonoBehaviour, IHittable
         IsInvincible = false;
     }
 
-    private void FireWithMode(FireModes fireMode)
+    private void FireWithMode(BulletType bulletType)
     {
-        switch (fireMode)
+        switch (bulletType)
         {
-            case FireModes.Straight:
+            case BulletType.Regular:
             default:
-                FireStraight();
+                FireBullet<BulletBehaviour>(FactoryTypes.Bullet);
+                break;
+            case BulletType.Splash:
+                FireBullet<SplashBulletBehaviour>(FactoryTypes.SplashBullet);
                 break;
         }
     }
@@ -220,14 +231,13 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    private void FireStraight()
+    private void FireBullet<T>(FactoryTypes type) where T : Shootable
     {
-
-        _currentBullet = MonoFactory.GetFactoryObject<BulletBehaviour>(FactoryTypes.Bullet);
+        _currentBullet = MonoFactory.GetFactoryObject<T>(type);
         _currentBullet.Player = this;
         _currentBullet.transform.position = _bulletSpawn.position;
         _currentBullet.transform.rotation = transform.rotation;
-    }
+    }    
 
     private float SignZero(float f)
     {

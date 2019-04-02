@@ -64,6 +64,8 @@
     <Compile Include="Assets\Scripts\BulletFactory.cs" />
     <Compile Include="Assets\Scripts\CustomStepSlider.cs" />
     <Compile Include="Assets\Scripts\DestroyableLevelObject.cs" />
+    <Compile Include="Assets\Scripts\EnumMaskAttribute.cs" />
+    <Compile Include="Assets\Scripts\EnumMaskPropertyDrawer.cs" />
     <Compile Include="Assets\Scripts\FactoryObject.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Scripts\GameMenu.cs" />
@@ -72,11 +74,9 @@
     <Compile Include="Assets\Scripts\LevelBounds.cs" />
     <Compile Include="Assets\Scripts\LevelBuilder.cs" />
     <Compile Include="Assets\Scripts\LevelObject.cs" />
-    <Compile Include="Assets\Scripts\MenuButtonListener.cs" />
     <Compile Include="Assets\Scripts\MenuUi.cs" />
     <Compile Include="Assets\Scripts\MonoFactory.cs" />
     <Compile Include="Assets\Scripts\NeoxMath.cs" />
-    <Compile Include="Assets\Scripts\PersistentData.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\PlayerUi.cs" />
     <Compile Include="Assets\Scripts\SettingsManager.cs" />

@@ -19,7 +19,7 @@ public class DestroyableLevelObject : LevelObject, IFactoryObject
     public override bool ExplodeShootable => false;
     public override bool ReflectShootable => false;
 
-    public FactoryTypes ObjectType => FactoryTypes.DestructibleCube;
+    public new FactoryTypes ObjectType => FactoryTypes.DestructibleCube;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -30,9 +30,10 @@ public class DestroyableLevelObject : LevelObject, IFactoryObject
 
     private void OnTriggerEnter(Collider other)
     {
-        BulletBehaviour bullet = other.gameObject.GetComponent<BulletBehaviour>();
+        Shootable bullet = other.gameObject.GetComponent<Shootable>();
         if (bullet != null)
         {
+            
             StartCoroutine(DelayedReturnRoutine());
         }
     }
@@ -45,7 +46,7 @@ public class DestroyableLevelObject : LevelObject, IFactoryObject
     }
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public void ReturnToFactory()
+    public new void ReturnToFactory()
     {
         MonoFactory.ReturnFactoryObject(this);
 

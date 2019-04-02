@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Neox.Helpers;
 
 
-public class LevelObject : MonoBehaviour, IHittable
+public class LevelObject : MonoBehaviour, IHittable, IFactoryObject
 {
 
     // --- Enums ------------------------------------------------------------------------------------------------------
@@ -19,6 +19,8 @@ public class LevelObject : MonoBehaviour, IHittable
     // --- Properties -------------------------------------------------------------------------------------------------
     public virtual bool ExplodeShootable => true;
     public virtual bool ReflectShootable => true;
+
+    public FactoryTypes ObjectType => FactoryTypes.Cube;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -38,7 +40,12 @@ public class LevelObject : MonoBehaviour, IHittable
         //bullet.Reflect(collision);
     }
 
-   
+    public void ReturnToFactory()
+    {
+        MonoFactory.ReturnFactoryObject(this);
+    }
+
+
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
 
     // --------------------------------------------------------------------------------------------

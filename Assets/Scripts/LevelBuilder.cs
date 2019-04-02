@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class LevelBuilder : MonoBehaviour
 {
+    public static LevelBuilder Instance { get; private set; }
     // --- Enums ------------------------------------------------------------------------------------------------------
 
     // --- Nested Classes ---------------------------------------------------------------------------------------------
@@ -13,21 +14,33 @@ public class LevelBuilder : MonoBehaviour
     public class CubeLevel
     {
         public List<Vector2> _cubePositions;
+        public FactoryTypes type;
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField] private int _levelIndex = 0;
+    [SerializeField] private int _levelIndex;
     [SerializeField] private CubeLevel[] _cubeLevels;
     // --- Properties -------------------------------------------------------------------------------------------------
-
+    public int LevelIndex
+    {
+        get { return _levelIndex; }
+        set { _levelIndex = value; }
+    }
     // --- Unity Functions --------------------------------------------------------------------------------------------
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(this);
+    }
     private void Start()
     {
-        if (_levelIndex >= 0 && _levelIndex <= _cubeLevels.Length)
-        {
-            LoadCubeLevel(_cubeLevels[_levelIndex]);
-            //StartCoroutine(BuildLevelAgainRoutine());
-        }
+       
     }
 
 #if UNITY_EDITOR
@@ -40,21 +53,43 @@ public class LevelBuilder : MonoBehaviour
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
+    public void BuildLevel()
+    {
+        if (_levelIndex >= 0 && _levelIndex <= _cubeLevels.Length)
+        {
+            LoadDestructibleOrNormalLevel(_cubeLevels[_levelIndex], _cubeLevels[_levelIndex].type);
+        }
+    }
+
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private IEnumerator BuildLevelAgainRoutine()
     {
         yield return new WaitForSeconds(5f);
-        LoadCubeLevel(_cubeLevels[_levelIndex]);
+        //LoadDestructibleCubeLevel(_cubeLevels[_levelIndex]);
     }
-    private void LoadCubeLevel(CubeLevel level)
+    private void LoadCubeLevel<T>(CubeLevel level, FactoryTypes type) where T : LevelObject
     {
+        Debug.Log("loading level" + _levelIndex);
         foreach (Vector2 pos in level._cubePositions)
         {
-            DestroyableLevelObject _cube = MonoFactory.GetFactoryObject<DestroyableLevelObject>(FactoryTypes.DestructibleCube) as DestroyableLevelObject;
+            LevelObject _cube = MonoFactory.GetFactoryObject<T>(type) as T;
             _cube.transform.position = new Vector3(pos.x, 0.5f, pos.y);
             Debug.Log("Building Level!   " + _cube.name + "cube position" + _cube.transform.position);
         }
 
+    }
+    private void LoadDestructibleOrNormalLevel(CubeLevel level, FactoryTypes factoryTypes)
+    {
+        switch (factoryTypes)
+        {
+            case FactoryTypes.Cube:
+            default:
+                LoadCubeLevel<LevelObject>(level, FactoryTypes.Cube);
+                break;
+            case FactoryTypes.DestructibleCube:
+                LoadCubeLevel<DestroyableLevelObject>(level, FactoryTypes.DestructibleCube);
+                break;
+        }
     }
 
     // --------------------------------------------------------------------------------------------

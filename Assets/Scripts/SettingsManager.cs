@@ -4,12 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+public enum BulletType
+{
+    Regular = 0,
+    Splash = 1
+}
+
+[Flags]
 public enum FireModes
 {
     Straight = 0,
-    Ricochet = 1,
-    Guided = 2,
-    GuidedRicochet = 3
+    Guided = 1 << 0,
+    Ricochet = 1 << 1,
 }
 
 public class SettingsManager : MonoBehaviour
@@ -27,23 +33,21 @@ public class SettingsManager : MonoBehaviour
         public bool _friendlyFire = true;
         public bool _invisibleTankMode = false;
         public bool _canBulletsBeDirected;
-        public FireModes _fireModes = FireModes.GuidedRicochet;
+        public BulletType _bulletType = BulletType.Regular;
+        [EnumMask(true)] public FireModes _fireModes = FireModes.Straight;
         [Range(2, 24)] public int _playerRotationSteps = 12;
         public int _maxScore = 10;
         public float _gameTimer = 60;
         public bool _isThereTimeLimit = false;
         public int _levelRange;
         public float _bulletLifeTime = 4;
+        public int _highscore;
 
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------    
     [SerializeField] private Settings _settings;
-    public PersistentData PersistentData
-    {
-        get;
-        private set;
-    }
+
     // --- Properties -------------------------------------------------------------------------------------------------
     public static bool FreePlayerRotation
     {
@@ -57,12 +61,17 @@ public class SettingsManager : MonoBehaviour
     }
     public static bool BouncyBullets
     {
-        get { return SelectedFireMode == FireModes.Ricochet || SelectedFireMode == FireModes.GuidedRicochet; }
+        get { return SelectedFireMode.HasFlag(FireModes.Ricochet); }
     }
     public static bool InvisibleTankMode
     {
         get { return Instance._settings._invisibleTankMode; }
         set { Instance._settings._invisibleTankMode = value; }
+    }
+    public static BulletType BulletType
+    {
+        get { return Instance._settings._bulletType; }
+        set { Instance._settings._bulletType = value; }
     }
     public static FireModes SelectedFireMode
     {
@@ -71,7 +80,7 @@ public class SettingsManager : MonoBehaviour
     }
     public static bool CanBulletsBeDirected
     {
-        get { return SelectedFireMode == FireModes.Guided || SelectedFireMode == FireModes.GuidedRicochet; }
+        get { return SelectedFireMode.HasFlag(FireModes.Guided); }
 
     }
     public static int PlayerRotationSteps
@@ -104,6 +113,11 @@ public class SettingsManager : MonoBehaviour
         get { return Instance._settings._bulletLifeTime; }
         set { Instance._settings._bulletLifeTime = value; }
     }
+    public static int HighScore
+    {
+        get { return Instance._settings._highscore; }
+        set { Instance._settings._highscore = value; }
+    }
 
 
 
@@ -111,8 +125,6 @@ public class SettingsManager : MonoBehaviour
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
-
-
         if (Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
@@ -122,20 +134,33 @@ public class SettingsManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this);
 
-        _settings = new Settings();
-        PersistentData = new PersistentData();
+        _settings = LoadData() ?? new Settings();
 
-       
-        
+
+
+
     }
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
     public static void SaveSettings()
     {
-        Instance.PersistentData.SetCurrentSettings(Instance._settings);
-        Instance.PersistentData.SaveData();
+        Instance._SaveSettings();
     }
-
+    public static Settings LoadData()
+    {
+        return Instance._LoadData();
+    }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
+    private void _SaveSettings()
+    {
+        string settingsJson = JsonUtility.ToJson(_settings, true);
+        File.WriteAllText(Path.Combine(Application.dataPath, "settings.json"), settingsJson);
+        Debug.Log(settingsJson);
+    }
+    private Settings _LoadData()
+    {
+        string settingsJson = File.ReadAllText(Path.Combine(Application.dataPath, "settings.json"));
+        return JsonUtility.FromJson<Settings>(settingsJson);
+    }
 
     // --------------------------------------------------------------------------------------------
 }

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public enum FactoryTypes
 {
     Bullet = 0,
-    Grenade = 1,
+    SplashBullet = 2,
     Cube = 10,
     DestructibleCube = 11
 }

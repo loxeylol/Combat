@@ -41,6 +41,11 @@ public class GameController : MonoBehaviour
     {
         get; set;
     }
+    public int CurrentLevelIndex
+    {
+        get => SceneManager.GetActiveScene().buildIndex -1;
+    }
+
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -111,6 +116,10 @@ public class GameController : MonoBehaviour
     {
         IsPaused = !IsPaused;
     }
+    public int GetHighScore()
+    {
+        return _combinedScorePlayerOne > _combinedScorePlayerTwo ? _combinedScorePlayerOne : _combinedScorePlayerTwo;
+    }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void GetPlayerControllers()
     {
@@ -138,7 +147,6 @@ public class GameController : MonoBehaviour
         if (Mathf.Max(FirstPlayerScore, SecondPlayerScore) >= SettingsManager.MaxScore)
         {
             string winner = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
-            Debug.Log(winner);
 
             LoadNextLevel();
         }
@@ -159,10 +167,16 @@ public class GameController : MonoBehaviour
     private void ResetGameStats()
     {
         GameTimer = SettingsManager.GameTimer;
+        SettingsManager.HighScore = GetHighScore();
         IsPaused = false;
         if (MonoFactory.Instance != null)
         {
             MonoFactory.ReturnAllChildren();
+        }
+        if(LevelBuilder.Instance!= null)
+        {
+            LevelBuilder.Instance.LevelIndex = CurrentLevelIndex;
+            LevelBuilder.Instance.BuildLevel();
         }
     }
 

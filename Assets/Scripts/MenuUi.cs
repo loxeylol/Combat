@@ -16,6 +16,7 @@ public class MenuUi : MonoBehaviour
     [SerializeField] private Text _title;
     [Header("Settings Content")]
     [SerializeField] private Dropdown _fireModeDropDown;
+    [SerializeField] private Dropdown _bulletTypeDropDown;
     [SerializeField] private Toggle _toggleFreePlayerRotation;
     [SerializeField] private Toggle _toggleFriendlyFire;
     [SerializeField] private Toggle _toggleInvisibleTankMode;
@@ -56,6 +57,10 @@ public class MenuUi : MonoBehaviour
         _playerRotationStepSliderText.text = _playerRotationStepsSlider.value.ToString();
         _maxScoreSliderText.text = _maxScoreSlider.value.ToString();
 
+        _bulletTypeDropDown.ClearOptions();
+        _bulletTypeDropDown.AddOptions(Enum.GetNames(typeof(BulletType)).ToList());
+        _bulletTypeDropDown.value = (int)SettingsManager.BulletType;
+
         _fireModeDropDown.ClearOptions();
         _fireModeDropDown.AddOptions(Enum.GetNames(typeof(FireModes)).ToList());
         _fireModeDropDown.value = (int)SettingsManager.SelectedFireMode;
@@ -64,6 +69,7 @@ public class MenuUi : MonoBehaviour
         _toggleFreePlayerRotation.onValueChanged.AddListener(state => SettingsManager.FreePlayerRotation = state);
         _toggleInvisibleTankMode.onValueChanged.AddListener(state => SettingsManager.InvisibleTankMode = state);
         _fireModeDropDown.onValueChanged.AddListener(state => SettingsManager.SelectedFireMode = (FireModes)state);
+        _bulletTypeDropDown.onValueChanged.AddListener(state => SettingsManager.BulletType = (BulletType)state);
         _toggleTimeLimit.onValueChanged.AddListener(OnToggleTimeLimit);
 
         _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
