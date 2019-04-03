@@ -18,6 +18,7 @@ public class LevelBuilder : MonoBehaviour
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------
+    [SerializeField] private GameObject _levelbuildCube;
     [SerializeField] private int _levelIndex;
     [SerializeField] private CubeLevel[] _cubeLevels;
     // --- Properties -------------------------------------------------------------------------------------------------
@@ -38,10 +39,6 @@ public class LevelBuilder : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this);
     }
-    private void Start()
-    {
-       
-    }
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -50,6 +47,8 @@ public class LevelBuilder : MonoBehaviour
             _levelIndex = Mathf.Clamp(_levelIndex, 0, _cubeLevels.Length - 1);
     }
 #endif
+
+
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
@@ -67,17 +66,23 @@ public class LevelBuilder : MonoBehaviour
         yield return new WaitForSeconds(5f);
         //LoadDestructibleCubeLevel(_cubeLevels[_levelIndex]);
     }
+
     private void LoadCubeLevel<T>(CubeLevel level, FactoryTypes type) where T : LevelObject
     {
         Debug.Log("loading level" + _levelIndex);
         foreach (Vector2 pos in level._cubePositions)
         {
-            LevelObject _cube = MonoFactory.GetFactoryObject<T>(type) as T;
-            _cube.transform.position = new Vector3(pos.x, 0.5f, pos.y);
-            Debug.Log("Building Level!   " + _cube.name + "cube position" + _cube.transform.position);
+            LevelObject _cube = MonoFactory.GetFactoryObject<T>(type);
+            if (_cube != null)
+            {
+                _cube.transform.position = new Vector3(pos.x, 0.5f, pos.y);
+                //Debug.Log("Building Level!   " + _cube.name + "cube position" + _cube.transform.position);
+
+            }
         }
 
     }
+
     private void LoadDestructibleOrNormalLevel(CubeLevel level, FactoryTypes factoryTypes)
     {
         switch (factoryTypes)

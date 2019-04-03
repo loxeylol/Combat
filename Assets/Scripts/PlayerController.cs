@@ -69,7 +69,10 @@ public class PlayerController : MonoBehaviour, IHittable
     }
     private float RotationInterval { get { return 360f / SettingsManager.PlayerRotationSteps; } }
     private float Speed { get { return _movementSpeed; } set { _movementSpeed = Mathf.Clamp(value, MIN_SPEED, MAX_SPEED); } }
-    private bool CanShoot { get { return CanMove && _currentBullet == null; } }
+    private bool CanShoot
+    {
+        get { return CanMove && _currentBullet == null; }
+    }
 
     private bool IsInvisible
     {
@@ -147,8 +150,7 @@ public class PlayerController : MonoBehaviour, IHittable
         Vector3 collisionNormal;
         if (collision != null)
         {
-            collisionNormal = -collision.contacts[0].normal;            
-            //Debug.DrawRay(playerNormal, knockbackDirection, Color.red);
+            collisionNormal = -collision.contacts[0].normal;
         }
         else
         {
@@ -237,7 +239,7 @@ public class PlayerController : MonoBehaviour, IHittable
         _currentBullet.Player = this;
         _currentBullet.transform.position = _bulletSpawn.position;
         _currentBullet.transform.rotation = transform.rotation;
-    }    
+    }
 
     private float SignZero(float f)
     {
@@ -245,8 +247,6 @@ public class PlayerController : MonoBehaviour, IHittable
             : f < 0f ? -1f
             : 0f;
     }
-
-
 
     // --------------------------------------------------------------------------------------------
 }

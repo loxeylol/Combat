@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DestroyableLevelObject : LevelObject, IFactoryObject
+public class DestroyableLevelObject : LevelObject
 {
 
     // --- Enums ------------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ public class DestroyableLevelObject : LevelObject, IFactoryObject
     public override bool ExplodeShootable => false;
     public override bool ReflectShootable => false;
 
-    public new FactoryTypes ObjectType => FactoryTypes.DestructibleCube;
+    public override FactoryTypes ObjectType => FactoryTypes.DestructibleCube;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -33,21 +33,16 @@ public class DestroyableLevelObject : LevelObject, IFactoryObject
         Shootable bullet = other.gameObject.GetComponent<Shootable>();
         if (bullet != null)
         {
+            Explode();
+            this.DoAfterSeconds(2f, false, ReturnToFactory);
             
-            StartCoroutine(DelayedReturnRoutine());
         }
     }
 
-    private IEnumerator DelayedReturnRoutine()
-    {
-        Explode();
-        yield return new WaitForSeconds(2f);
-        ReturnToFactory();
-    }
-
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public new void ReturnToFactory()
+    public override void ReturnToFactory()
     {
+        Debug.Log($"{this.GetType().Name} returning to factory!");
         MonoFactory.ReturnFactoryObject(this);
 
         for (int i = 0; i < _prefab.transform.childCount; i++)

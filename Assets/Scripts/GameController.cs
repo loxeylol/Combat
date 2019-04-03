@@ -43,7 +43,7 @@ public class GameController : MonoBehaviour
     }
     public int CurrentLevelIndex
     {
-        get => SceneManager.GetActiveScene().buildIndex -1;
+        get => SceneManager.GetActiveScene().buildIndex;
     }
 
 
@@ -96,15 +96,15 @@ public class GameController : MonoBehaviour
     }
     public void LoadNextLevel()
     {
-        Debug.Log("Load Next level");
         if (!SceneChanged)
         {
             return;
         }
 
+        Debug.Log("Load Next level");
         SceneChanged = false;
         SetCombinedScore();
-        ResetGameStats();
+        // ResetGameStats();
 
         int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
         if (nextScene < SceneManager.sceneCountInBuildSettings)
@@ -173,10 +173,16 @@ public class GameController : MonoBehaviour
         {
             MonoFactory.ReturnAllChildren();
         }
-        if(LevelBuilder.Instance!= null)
+
+        if (LevelBuilder.Instance != null)
         {
-            LevelBuilder.Instance.LevelIndex = CurrentLevelIndex;
+            LevelBuilder.Instance.LevelIndex = CurrentLevelIndex - 1;
+
             LevelBuilder.Instance.BuildLevel();
+        }
+        if (!SettingsManager.OverWriteLevelSettings)
+        {
+            SettingsManager.Instance.SetSettings(CurrentLevelIndex);
         }
     }
 

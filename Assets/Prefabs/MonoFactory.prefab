@@ -50,8 +50,20 @@ MonoBehaviour:
     allowGrowth: 0
     type: 0
     counter: 0
-  - prefab: {fileID: 989520081415848319, guid: b87384970f9235a4f926d705a99b202b, type: 3}
-    startAmount: 5
+  - prefab: {fileID: 7408702214432223040, guid: 93e7ccec33d33ff45ae4a436cc3fbe38,
+      type: 3}
+    startAmount: 10
     allowGrowth: 0
+    type: 0
+    counter: 0
+  - prefab: {fileID: 989520081415848319, guid: b87384970f9235a4f926d705a99b202b, type: 3}
+    startAmount: 10
+    allowGrowth: 1
+    type: 0
+    counter: 0
+  - prefab: {fileID: 5846215048625379741, guid: 5113d2c8ffb83f14fbb08c416db4dfd4,
+      type: 3}
+    startAmount: 10
+    allowGrowth: 1
     type: 0
     counter: 0

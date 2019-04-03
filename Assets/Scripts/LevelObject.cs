@@ -20,7 +20,7 @@ public class LevelObject : MonoBehaviour, IHittable, IFactoryObject
     public virtual bool ExplodeShootable => true;
     public virtual bool ReflectShootable => true;
 
-    public FactoryTypes ObjectType => FactoryTypes.Cube;
+    public virtual FactoryTypes ObjectType => FactoryTypes.Cube;
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -40,8 +40,9 @@ public class LevelObject : MonoBehaviour, IHittable, IFactoryObject
         //bullet.Reflect(collision);
     }
 
-    public void ReturnToFactory()
+    public virtual void ReturnToFactory()
     {
+        Debug.Log($"{this.GetType().Name} returning to factory!");
         MonoFactory.ReturnFactoryObject(this);
     }
 

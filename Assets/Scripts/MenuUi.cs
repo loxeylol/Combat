@@ -20,12 +20,13 @@ public class MenuUi : MonoBehaviour
     [SerializeField] private Toggle _toggleFreePlayerRotation;
     [SerializeField] private Toggle _toggleFriendlyFire;
     [SerializeField] private Toggle _toggleInvisibleTankMode;
+    [SerializeField] private Toggle _toggleTimeLimit;
+    [SerializeField] private Toggle _toggleOverrideLevelSettings;
     [SerializeField] private Slider _playerRotationStepsSlider;
     [SerializeField] private Slider _maxScoreSlider;
     [SerializeField] private Button _toggleSettingsButton;
     [SerializeField] private GameObject _settingsContent;
     [SerializeField] private GameObject _menuContent;
-    [SerializeField] private Toggle _toggleTimeLimit;
     [SerializeField] private GameObject[] _toggledUiElements;
     [SerializeField] private Slider _levelSelectSlider;
     [Header("Main Menu")]
@@ -46,12 +47,15 @@ public class MenuUi : MonoBehaviour
         _levelSelectSlider.maxValue = SettingsManager.LevelRange;
         _levelSelectSlider.value = 1f;
 
+
+
         _toggleInvisibleTankMode.isOn = SettingsManager.InvisibleTankMode;
         _toggleFriendlyFire.isOn = SettingsManager.FriendlyFire;
         _toggleFreePlayerRotation.isOn = SettingsManager.FreePlayerRotation;
         _playerRotationStepsSlider.value = SettingsManager.PlayerRotationSteps;
         _maxScoreSlider.value = SettingsManager.MaxScore;
         _toggleTimeLimit.isOn = SettingsManager.IsThereTimeLimit;
+        _toggleOverrideLevelSettings.isOn = SettingsManager.OverWriteLevelSettings;
 
         _levelSelectSliderText.text = _levelSelectSlider.value.ToString();
         _playerRotationStepSliderText.text = _playerRotationStepsSlider.value.ToString();
@@ -65,12 +69,16 @@ public class MenuUi : MonoBehaviour
         _fireModeDropDown.AddOptions(Enum.GetNames(typeof(FireModes)).ToList());
         _fireModeDropDown.value = (int)SettingsManager.SelectedFireMode;
 
+        _toggleOverrideLevelSettings.onValueChanged.AddListener(state => SettingsManager.OverWriteLevelSettings = state);
         _toggleFriendlyFire.onValueChanged.AddListener(state => SettingsManager.FriendlyFire = state);
         _toggleFreePlayerRotation.onValueChanged.AddListener(state => SettingsManager.FreePlayerRotation = state);
         _toggleInvisibleTankMode.onValueChanged.AddListener(state => SettingsManager.InvisibleTankMode = state);
         _fireModeDropDown.onValueChanged.AddListener(state => SettingsManager.SelectedFireMode = (FireModes)state);
         _bulletTypeDropDown.onValueChanged.AddListener(state => SettingsManager.BulletType = (BulletType)state);
         _toggleTimeLimit.onValueChanged.AddListener(OnToggleTimeLimit);
+
+        _toggledUiElements[0].SetActive(_toggleTimeLimit.enabled);
+        _toggledUiElements[1].SetActive(_toggleTimeLimit.enabled);
 
         _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         _toggleSettingsButton.onClick.AddListener(OnSettingsButtonClicked);

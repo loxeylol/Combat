@@ -49,7 +49,7 @@ public class GameMenu : MonoBehaviour
     private void OnBackToMenuButtonClicked()
     {
         SettingsManager.HighScore = GameController.Instance.GetHighScore();
-        SettingsManager.SaveSettings();
+        //SettingsManager.SaveSettings();
         GameController.Instance.LoadLevelWithIndex(0);
     }
     // --------------------------------------------------------------------------------------------

@@ -7,7 +7,8 @@ using UnityEngine;
 public enum BulletType
 {
     Regular = 0,
-    Splash = 1
+    Splash = 1,
+    Multiple = 2
 }
 
 [Flags]
@@ -47,7 +48,7 @@ public class SettingsManager : MonoBehaviour
 
     // --- Fields -----------------------------------------------------------------------------------------------------    
     [SerializeField] private Settings _settings;
-
+    private bool _overWriteLevelSettings;
     // --- Properties -------------------------------------------------------------------------------------------------
     public static bool FreePlayerRotation
     {
@@ -118,6 +119,11 @@ public class SettingsManager : MonoBehaviour
         get { return Instance._settings._highscore; }
         set { Instance._settings._highscore = value; }
     }
+    public static bool OverWriteLevelSettings
+    {
+        get { return Instance._overWriteLevelSettings; }
+        set { Instance._overWriteLevelSettings = value; }
+    }
 
 
 
@@ -130,37 +136,46 @@ public class SettingsManager : MonoBehaviour
             Destroy(this.gameObject);
             return;
         }
-
         Instance = this;
         DontDestroyOnLoad(this);
-
-        _settings = LoadData() ?? new Settings();
-
-
-
-
+        _settings = new Settings();
+        SetSettings();
     }
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
     public static void SaveSettings()
     {
         Instance._SaveSettings();
     }
-    public static Settings LoadData()
+    public static Settings LoadData(string settings = "lastSavedSettings.json")
     {
-        return Instance._LoadData();
+        return Instance._LoadData(settings);
+    }
+    public Settings GetLevelSettings()
+    {
+        return new Settings();
+    }
+    public void SetSettings(int index = 0)
+    {
+        Instance._SetSettings(index);
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
+
     private void _SaveSettings()
     {
         string settingsJson = JsonUtility.ToJson(_settings, true);
-        File.WriteAllText(Path.Combine(Application.dataPath, "settings.json"), settingsJson);
+        File.WriteAllText(Path.Combine(Application.dataPath, "lastSavedSettings.json"), settingsJson);
         Debug.Log(settingsJson);
     }
-    private Settings _LoadData()
+    private Settings _LoadData(string settings = "lastSavedSettings.json")
     {
-        string settingsJson = File.ReadAllText(Path.Combine(Application.dataPath, "settings.json"));
-        return JsonUtility.FromJson<Settings>(settingsJson);
+        string settingsJson = File.ReadAllText(Path.Combine(Application.dataPath, settings)) ?? null;
+        return settingsJson != null ? JsonUtility.FromJson<Settings>(settingsJson) : null;
     }
+    private void _SetSettings(int index = 0)
+    {
+        _settings = LoadData("settings " + index + ".json") ?? LoadData();
+    }
+
 
     // --------------------------------------------------------------------------------------------
 }

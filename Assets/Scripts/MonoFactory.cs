@@ -31,6 +31,7 @@ public class MonoFactory : MonoBehaviour
             {
                 Add();
             }
+
         }
 
         public void Add()
@@ -96,6 +97,7 @@ public class MonoFactory : MonoBehaviour
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void _ReturnAllChildren()
     {
+        Debug.Log("Return all children");
         foreach (IFactoryObject returnable in GetComponentsInChildren<IFactoryObject>(false))
         {
             returnable.ReturnToFactory();
@@ -133,7 +135,7 @@ public class MonoFactory : MonoBehaviour
         if (ft == null)
         {
             Debug.LogWarning($"Type {typeof(T).Name} does not exists in the factory.");
-
+            return;
         }
 
         obj.gameObject.SetActive(false);
@@ -157,9 +159,16 @@ public class MonoFactory : MonoBehaviour
 
             ft.Add();
         }
-
         T obj = ft.queue.Dequeue() as T;
-        obj.gameObject.SetActive(true);
+        if (obj != null)
+        {
+            obj.gameObject.SetActive(true);
+
+        }
+        else
+        {
+            Debug.LogError($"Failed to get object of type {typeof(T).Name}");
+        }
         return obj;
     }
 

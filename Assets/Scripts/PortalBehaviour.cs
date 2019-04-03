@@ -2,26 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class FactoryObject : MonoBehaviour, IFactoryObject
+
+public class PortalBehaviour : LevelObject
 {
     // --- Enums ------------------------------------------------------------------------------------------------------
 
     // --- Nested Classes ---------------------------------------------------------------------------------------------
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField] private FactoryTypes _objectType;
-
+    [SerializeField] private GameObject _otherPortal;
     // --- Properties -------------------------------------------------------------------------------------------------
-    public FactoryTypes ObjectType => _objectType;
-
-    // --- Unity Functions --------------------------------------------------------------------------------------------    
-
-    // --- Public/Internal Methods ------------------------------------------------------------------------------------
-    public void ReturnToFactory()
+    public override bool ExplodeShootable => false;
+    public override bool ReflectShootable => false;
+    // --- Unity Functions --------------------------------------------------------------------------------------------
+    private void Awake()
     {
-        MonoFactory.ReturnFactoryObject(this);
+		
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        other.transform.position = _otherPortal.transform.position;
+    }
+    // --- Public/Internal Methods ------------------------------------------------------------------------------------
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
 
