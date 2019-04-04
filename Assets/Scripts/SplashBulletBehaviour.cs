@@ -66,7 +66,7 @@ public class SplashBulletBehaviour : Shootable
         _meshRenderer.enabled = false;
         StopCoroutine(_lifetimeRoutine);
         Explosion.Play();
-        while (Explosion.time < Explosion.main.duration-0.5f)
+        while (Explosion.time < Explosion.main.duration - 0.5f)
         {
             _radius = NeoxMath.Lerp(0, 1.5f, Explosion.time, InterpolationTypes.Linear);
             CheckCollisionRadius(_radius);
@@ -87,12 +87,12 @@ public class SplashBulletBehaviour : Shootable
 
         foreach (Collider col in AllCollisions)
         {
-            PlayerController Player = col.GetComponent<PlayerController>();
-            if (Player != null&&!_hitPlayer)
+            PlayerController _Player = col.GetComponent<PlayerController>();
+            if (_Player != null && !_hitPlayer)
             {
                 _hitPlayer = true;
-                Player.OnHit(this, null);
-                Debug.Log("hitPlayer");
+                _Player.OnHit(this, null);
+                Debug.Log($"Hit Player {_Player.name}");
 
             }
         }

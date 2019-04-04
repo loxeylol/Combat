@@ -168,8 +168,18 @@ public class SettingsManager : MonoBehaviour
     }
     private Settings _LoadData(string settings = "lastSavedSettings.json")
     {
-        string settingsJson = File.ReadAllText(Path.Combine(Application.dataPath, settings)) ?? null;
-        return settingsJson != null ? JsonUtility.FromJson<Settings>(settingsJson) : null;
+        string filepath = Path.Combine(Application.dataPath, settings);
+        string settingsJson;
+        if (File.Exists(filepath))
+        {
+            settingsJson = File.ReadAllText(filepath);
+        }
+        else
+        {
+            filepath = Path.Combine(Application.dataPath, "lastSavedSettings.json");
+            settingsJson = File.ReadAllText(filepath);
+        }
+        return JsonUtility.FromJson<Settings>(settingsJson);
     }
     private void _SetSettings(int index = 0)
     {

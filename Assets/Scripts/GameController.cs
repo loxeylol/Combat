@@ -16,11 +16,10 @@ public class GameController : MonoBehaviour
     [SerializeField] private PlayerController _playerOne;
     [SerializeField] private PlayerController _playerTwo;
 
-    private int _combinedScorePlayerOne, _combinedScorePlayerTwo;
     private bool _isPaused;
-
+    public Action<PlayerController> GameOver;
     // --- Properties -------------------------------------------------------------------------------------------------
-    private bool SceneChanged { get; set; }
+    private bool LevelChanged { get; set; }
     public int FirstPlayerScore => _playerOne.Score;
     public int SecondPlayerScore => _playerTwo.Score;
     public bool IsPaused
@@ -32,6 +31,8 @@ public class GameController : MonoBehaviour
             Time.timeScale = _isPaused ? 0f : 1f;
         }
     }
+    public int CombinedScorePlayerOne { get; private set; }
+    public int CombinedScorePlayerTwo { get; private set; }
     public float GameTimer
     {
         get; set;
@@ -43,7 +44,7 @@ public class GameController : MonoBehaviour
     }
     public int CurrentLevelIndex
     {
-        get => SceneManager.GetActiveScene().buildIndex;
+        get; set;
     }
 
 
@@ -63,7 +64,7 @@ public class GameController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         _isPaused = false;
         SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
-        SettingsManager.LevelRange = SceneManager.sceneCountInBuildSettings - 1;
+        //SettingsManager.LevelRange = SceneManager.sceneCountInBuildSettings - 1;
     }
 
     private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
@@ -88,7 +89,6 @@ public class GameController : MonoBehaviour
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
     public void LoadLevelWithIndex(int index)
     {
-
         if (SceneManager.GetSceneByBuildIndex(index) != null)
         {
             SceneManager.LoadSceneAsync(index, LoadSceneMode.Single);
@@ -96,21 +96,23 @@ public class GameController : MonoBehaviour
     }
     public void LoadNextLevel()
     {
-        if (!SceneChanged)
+        if (!LevelChanged)
         {
             return;
         }
 
         Debug.Log("Load Next level");
-        SceneChanged = false;
+        LevelChanged = false;
         SetCombinedScore();
-        // ResetGameStats();
-
-        int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
-        if (nextScene < SceneManager.sceneCountInBuildSettings)
-            SceneManager.LoadScene(nextScene);
-        else
+        if (CurrentLevelIndex > SettingsManager.LevelRange)
+        {
             GameIsOver();
+        }
+        else
+        {
+            ResetGameStats();
+        }
+
     }
     public void PauseGame()
     {
@@ -118,12 +120,17 @@ public class GameController : MonoBehaviour
     }
     public int GetHighScore()
     {
-        return _combinedScorePlayerOne > _combinedScorePlayerTwo ? _combinedScorePlayerOne : _combinedScorePlayerTwo;
+        return CombinedScorePlayerOne > CombinedScorePlayerTwo ? CombinedScorePlayerOne : CombinedScorePlayerTwo;
+    }
+    public void ResetCombinedPlayerScore()
+    {
+        CombinedScorePlayerOne = 0;
+        CombinedScorePlayerTwo = 0;
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void GetPlayerControllers()
     {
-        SceneChanged = true;
+        LevelChanged = true;
         if (SceneManager.GetActiveScene() != SceneManager.GetSceneByBuildIndex(0))
         {
             _playerOne = GameObject.Find("Player1").GetComponent<PlayerController>();
@@ -136,8 +143,6 @@ public class GameController : MonoBehaviour
         GameTimer -= Time.deltaTime;
         if (GameTimer <= 0)
         {
-            string a = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
-            Debug.Log(a);
             LoadNextLevel();
         }
 
@@ -146,21 +151,38 @@ public class GameController : MonoBehaviour
     {
         if (Mathf.Max(FirstPlayerScore, SecondPlayerScore) >= SettingsManager.MaxScore)
         {
-            string winner = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
-
             LoadNextLevel();
         }
     }
     private void GameIsOver()
     {
-        string winner = FirstPlayerScore > SecondPlayerScore ? "PlayerOne Wins!" : "PlayerTwo Wins!";
-        Debug.Log(winner);
+        if (CombinedScorePlayerOne > CombinedScorePlayerTwo)
+        {
+            GameOver?.Invoke(_playerOne);
+        }
+        else if (CombinedScorePlayerOne < CombinedScorePlayerTwo)
+        {
+            GameOver?.Invoke(_playerTwo);
+        }
+        else
+        {
+            GameOver?.Invoke(null);
+        }
+
+        ResetPlayer();
     }
     private void SetCombinedScore()
     {
-        _combinedScorePlayerOne += FirstPlayerScore;
-        _combinedScorePlayerTwo += SecondPlayerScore;
-        Debug.Log(_combinedScorePlayerOne + "CombinedScorePlayerOne  -  CombinedScorePlayerTwo " + _combinedScorePlayerTwo);
+        CombinedScorePlayerOne += FirstPlayerScore;
+        CombinedScorePlayerTwo += SecondPlayerScore;
+    }
+
+    private void ResetPlayer()
+    {
+        _playerOne.SetPlayerToStartPos();
+        _playerTwo.SetPlayerToStartPos();
+        _playerOne.Score = 0;
+        _playerTwo.Score = 0;
 
     }
 
@@ -169,21 +191,31 @@ public class GameController : MonoBehaviour
         GameTimer = SettingsManager.GameTimer;
         SettingsManager.HighScore = GetHighScore();
         IsPaused = false;
-        if (MonoFactory.Instance != null)
+        if (CurrentLevelIndex >= 1)
         {
-            MonoFactory.ReturnAllChildren();
-        }
 
-        if (LevelBuilder.Instance != null)
-        {
-            LevelBuilder.Instance.LevelIndex = CurrentLevelIndex - 1;
+            if (MonoFactory.Instance != null)
+            {
+                MonoFactory.ReturnAllChildren();
+            }
 
-            LevelBuilder.Instance.BuildLevel();
+            if (LevelBuilder.Instance != null)
+            {
+                LevelBuilder.Instance.LevelIndex = CurrentLevelIndex - 1;
+
+                LevelBuilder.Instance.BuildLevel();
+            }
+            if (!SettingsManager.OverWriteLevelSettings)
+            {
+                SettingsManager.Instance.SetSettings(CurrentLevelIndex);
+            }
+            if (_playerTwo != null && _playerOne != null)
+            {
+                ResetPlayer();
+            }
         }
-        if (!SettingsManager.OverWriteLevelSettings)
-        {
-            SettingsManager.Instance.SetSettings(CurrentLevelIndex);
-        }
+        CurrentLevelIndex++;
+        LevelChanged = true;
     }
 
     // --------------------------------------------------------------------------------------------

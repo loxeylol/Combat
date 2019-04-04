@@ -44,9 +44,9 @@ public class MenuUi : MonoBehaviour
 
         _levelSelectSlider.wholeNumbers = true;
         _levelSelectSlider.minValue = 1f;
-        _levelSelectSlider.maxValue = SettingsManager.LevelRange;
+        _levelSelectSlider.maxValue = LevelBuilder.Instance.LevelRange;
         _levelSelectSlider.value = 1f;
-
+        SettingsManager.LevelRange = (int)_levelSelectSlider.maxValue;
 
 
         _toggleInvisibleTankMode.isOn = SettingsManager.InvisibleTankMode;
@@ -77,8 +77,8 @@ public class MenuUi : MonoBehaviour
         _bulletTypeDropDown.onValueChanged.AddListener(state => SettingsManager.BulletType = (BulletType)state);
         _toggleTimeLimit.onValueChanged.AddListener(OnToggleTimeLimit);
 
-        _toggledUiElements[0].SetActive(_toggleTimeLimit.enabled);
-        _toggledUiElements[1].SetActive(_toggleTimeLimit.enabled);
+        _toggledUiElements[0].SetActive(_toggleTimeLimit.isOn);
+        _toggledUiElements[1].SetActive(!_toggleTimeLimit.isOn);
 
         _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         _toggleSettingsButton.onClick.AddListener(OnSettingsButtonClicked);
@@ -135,7 +135,8 @@ public class MenuUi : MonoBehaviour
 
     public void OnStartGameButtonClicked()
     {
-        GameController.Instance.LoadLevelWithIndex((int)_levelSelectSlider.value);
+        GameController.Instance.CurrentLevelIndex = (int)_levelSelectSlider.value;
+        GameController.Instance.LoadLevelWithIndex(1);
     }
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
 

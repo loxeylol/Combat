@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private Vector2 _input;
     private Vector3 _startPos;
+    private Quaternion _startRot;
 
     //private bool _isHitting;
     private float _rotateTimer;
@@ -97,7 +98,12 @@ public class PlayerController : MonoBehaviour, IHittable
         IsInvisible = SettingsManager.InvisibleTankMode;
         _rotateTimer = 0f;
         CanMove = true;
+        _startPos = this.transform.position;
+        _startRot = this.transform.rotation;
+
+        
     }
+
 
     private void Update()
     {
@@ -128,7 +134,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
         if (SettingsManager.InvisibleTankMode)
         {
-            IsInvisible = CanShoot == true || CanMove == false;
+            IsInvisible = CanShoot == true || CanMove == true;
+            
         }
     }
 
@@ -142,7 +149,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             Score--;
         }
-        else
+        else if(bullet.Player != this)
         {
             bullet.Player.Score++;
         }
@@ -164,6 +171,17 @@ public class PlayerController : MonoBehaviour, IHittable
     public void ClearBullet()
     {
         _currentBullet = null;
+    }
+    public void SetPlayerToStartPos()
+    {
+        StopAllCoroutines();
+        IsInvincible = false;
+        CanMove = false;
+        Debug.LogWarning($"Reset Player {this.gameObject.name} to {_startPos}");
+        transform.position = _startPos;
+        transform.rotation = _startRot;
+        CanMove = true;
+
     }
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------

@@ -14,11 +14,11 @@ public class LevelBuilder : MonoBehaviour
     public class CubeLevel
     {
         public List<Vector2> _cubePositions;
+        public Vector2[] _playerStartPos = new Vector2[2];
         public FactoryTypes type;
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------
-    [SerializeField] private GameObject _levelbuildCube;
     [SerializeField] private int _levelIndex;
     [SerializeField] private CubeLevel[] _cubeLevels;
     // --- Properties -------------------------------------------------------------------------------------------------
@@ -26,6 +26,11 @@ public class LevelBuilder : MonoBehaviour
     {
         get { return _levelIndex; }
         set { _levelIndex = value; }
+    }
+
+    public int LevelRange
+    {
+        get => _cubeLevels.Length;
     }
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -45,6 +50,15 @@ public class LevelBuilder : MonoBehaviour
     {
         if (_cubeLevels != null)
             _levelIndex = Mathf.Clamp(_levelIndex, 0, _cubeLevels.Length - 1);
+    }
+
+    private void OnDrawGizmos()
+    {
+        foreach (Vector2 pos in _cubeLevels[_levelIndex]._cubePositions)
+        {
+            Gizmos.DrawWireCube(new Vector3(pos.x, 0.5f, pos.y), Vector3.one);
+        }
+        
     }
 #endif
 
@@ -73,6 +87,10 @@ public class LevelBuilder : MonoBehaviour
         foreach (Vector2 pos in level._cubePositions)
         {
             LevelObject _cube = MonoFactory.GetFactoryObject<T>(type);
+            foreach(Rigidbody rb in _cube.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = true;
+            }
             if (_cube != null)
             {
                 _cube.transform.position = new Vector3(pos.x, 0.5f, pos.y);

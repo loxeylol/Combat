@@ -24,12 +24,7 @@ public class PlayerUi : MonoBehaviour
         _player.scoreChanged += (score) => _playerLabel.text = score.ToString();
     }
 
-   
 
-    //private void Update()
-    //{
-    //    _playerLabel.text = _player.Score.ToString();
-    //}
 
     // --- Public/Internal Methods ------------------------------------------------------------------------------------
 

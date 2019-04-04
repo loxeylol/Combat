@@ -24,8 +24,8 @@ public class DestroyableLevelObject : LevelObject
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {
-
         _prefab = MonoFactory.GetFactoryPrefab(this);
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -33,9 +33,16 @@ public class DestroyableLevelObject : LevelObject
         Shootable bullet = other.gameObject.GetComponent<Shootable>();
         if (bullet != null)
         {
+
+            foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+            {
+                if (rb.gameObject == this.gameObject)
+                    continue;
+                rb.isKinematic = false;
+            }
             Explode();
-            this.DoAfterSeconds(2f, false, ReturnToFactory);
-            
+            this.DoAfterSeconds(4f, false, ReturnToFactory);
+
         }
     }
 
@@ -43,23 +50,36 @@ public class DestroyableLevelObject : LevelObject
     public override void ReturnToFactory()
     {
         Debug.Log($"{this.GetType().Name} returning to factory!");
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        {
+            if (rb.gameObject == this.gameObject)
+                continue;
+            rb.isKinematic = true;
+        }
         MonoFactory.ReturnFactoryObject(this);
 
         for (int i = 0; i < _prefab.transform.childCount; i++)
         {
-            this.transform.GetChild(i).localPosition = _prefab.transform.GetChild(i).localPosition;
-            this.transform.GetChild(i).localRotation = _prefab.transform.GetChild(i).localRotation;
+            for (int j = 0; j < _prefab.transform.GetChild(i).childCount; j++)
+            {
+                for (int k = 0; k < _prefab.transform.GetChild(i).GetChild(j).childCount; k++)
+                {
+                    transform.GetChild(i).GetChild(j).GetChild(k).localRotation = _prefab.transform.GetChild(i).GetChild(j).GetChild(k).localRotation;
+                    transform.GetChild(i).GetChild(j).GetChild(k).localPosition = _prefab.transform.GetChild(i).GetChild(j).GetChild(k).localPosition;
+                }
+
+            }
         }
+
     }
 
     // --- Protected/Private Methods ----------------------------------------------------------------------------------
     private void Explode()
     {
-        foreach(Rigidbody rb in GetComponentsInChildren<Rigidbody>())
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
         {
             if (rb.gameObject == this.gameObject)
                 continue;
-
             rb.AddForce(rb.transform.localPosition.normalized * _explosionForce, ForceMode.Impulse);
         }
     }
