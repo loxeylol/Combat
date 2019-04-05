@@ -29,9 +29,12 @@ public class MenuUi : MonoBehaviour
     [SerializeField] private GameObject _menuContent;
     [SerializeField] private GameObject[] _toggledUiElements;
     [SerializeField] private Slider _levelSelectSlider;
+    [SerializeField] private Toggle _splitScreenToggle;
     [Header("Main Menu")]
     [SerializeField] private Button _backToMainMenuButton;
     [SerializeField] private Button _startGameButton;
+    [SerializeField] private Button _quitGameButton;
+    
     private Text _playerRotationStepSliderText, _maxScoreSliderText, _timeLimitSliderText, _levelSelectSliderText;
     // --- Properties -------------------------------------------------------------------------------------------------
 
@@ -76,10 +79,12 @@ public class MenuUi : MonoBehaviour
         _fireModeDropDown.onValueChanged.AddListener(state => SettingsManager.SelectedFireMode = (FireModes)state);
         _bulletTypeDropDown.onValueChanged.AddListener(state => SettingsManager.BulletType = (BulletType)state);
         _toggleTimeLimit.onValueChanged.AddListener(OnToggleTimeLimit);
+        _splitScreenToggle.onValueChanged.AddListener(state => SettingsManager.SplitScreenMode = state);
 
         _toggledUiElements[0].SetActive(_toggleTimeLimit.isOn);
         _toggledUiElements[1].SetActive(!_toggleTimeLimit.isOn);
 
+        _quitGameButton.onClick.AddListener(() => Application.Quit());
         _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
         _toggleSettingsButton.onClick.AddListener(OnSettingsButtonClicked);
         _backToMainMenuButton.onClick.AddListener(OnSettingsSaveAndGoBackButtonPressed);

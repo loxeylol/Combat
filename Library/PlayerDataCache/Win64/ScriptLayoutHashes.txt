@@ -1,6 +1,6 @@
 Win64
 PlayerPath?
-C:/NeoxDev/teswtbuilds/Combat.exe
+C:/NeoxDev/Combat/Build/Combat.exe
 SceneListBegin?
 Assets/Scenes/MainMenu.unity
 Assets/Scenes/Level01.unity
@@ -9,7 +9,7 @@ SceneListEnd?
 984dcc0ba3707b7691fbdca8ff508d28 Unity.TextMeshPro.dll:TMPro.TMP_SelectionCaret
 e38c0094de245184b37bb9ae5de4a56a Assembly-CSharp.dll:.SplashBulletBehaviour
 01aa15e337e3a9c62f15153dfac6d589 Unity.TextMeshPro.dll:TMPro.TMP_Dropdown
-d658fc70013c2cb83fc9d71ddbb91f23 Assembly-CSharp.dll:.MenuUi
+e5e94f9eb9a6ef6f39c2196a7652bb14 Assembly-CSharp.dll:.MenuUi
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
 06f0fef534ca4c1d6064fd77a26bf722 UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationTrack
 8747051d8c53856e2def93af4f2a8b08 UnityEngine.Timeline.dll:UnityEngine.Timeline.AnimationPlayableAsset
@@ -23,7 +23,7 @@ e1bbf0ab858085e38fae6b12ebbdcd35 UnityEngine.Timeline.dll:UnityEngine.Timeline.G
 e1bbf0ab858085e38fae6b12ebbdcd35 UnityEngine.Timeline.dll:UnityEngine.Timeline.PlayableTrack
 201e3fde670b00545944bb3db215c80a UnityEngine.Timeline.dll:UnityEngine.Timeline.TimelineAsset
 e7a73f5f78ba6445195ec23b74a1ce2d Unity.TextMeshPro.dll:TMPro.TMP_ScrollbarEventHandler
-c3ad141b32fac9cec8f9ce00248e772d Assembly-CSharp.dll:.PlayerController
+427fe681c7b1aae8febdcde47588509f Assembly-CSharp.dll:.PlayerController
 cf9f5cf2c3145a37ac07f00e50e460f9 UnityEngine.UI.dll:UnityEngine.UI.AspectRatioFitter
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.UI.dll:UnityEngine.EventSystems.BaseInput
 5fc094978ce3e3591a7500ed380d854a UnityEngine.UI.dll:UnityEngine.UI.Button
@@ -123,7 +123,7 @@ d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.Spa
 303ad70ce203ad874efe2965d0fbcff9 Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsEventTracker
 7fb9de8dcf73854b6b328eca1f7a6e6d Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsTracker
 94017dcc9f00fe671ea7dc427b4da011 Unity.TextMeshPro.dll:TMPro.TMP_SpriteAsset
-9ae58e79bf015486f62858cf8c8e7748 Assembly-CSharp.dll:.SettingsManager
+f5fff9495f3b46a6ef626f825ec24c8f Assembly-CSharp.dll:.SettingsManager
 e38c0094de245184b37bb9ae5de4a56a Assembly-CSharp.dll:.BulletBehaviour
 b3ab2106268377ffe25dd18ac23dca28 Unity.TextMeshPro.dll:TMPro.TMP_Asset
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.Analytics.Editor.dll:UnityEditor.Analytics.AnalyticsEventTrackerEditor

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-
 public enum BulletType
 {
     Regular = 0,
@@ -22,6 +21,11 @@ public enum FireModes
 public class SettingsManager : MonoBehaviour
 {
     public static SettingsManager Instance { get; private set; }
+
+    public const string DEFAULT_SETTING = "Default_settings";
+    public const string USER_SETTINGS_FILENAME = "user_settings.json";
+
+    private string UserSettingsFilepath => Path.Combine(Application.dataPath, USER_SETTINGS_FILENAME);
 
     // --- Enums ------------------------------------------------------------------------------------------------------
 
@@ -42,8 +46,8 @@ public class SettingsManager : MonoBehaviour
         public bool _isThereTimeLimit = false;
         public int _levelRange;
         public float _bulletLifeTime = 4;
+        public bool _splitScreenMode; 
         public int _highscore;
-
     }
 
     // --- Fields -----------------------------------------------------------------------------------------------------    
@@ -125,8 +129,11 @@ public class SettingsManager : MonoBehaviour
         set { Instance._overWriteLevelSettings = value; }
     }
 
-
-
+    public static bool SplitScreenMode
+    {
+        get { return Instance._settings._splitScreenMode; }
+        set { Instance._settings._splitScreenMode = value; }
+    }
 
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
@@ -146,7 +153,7 @@ public class SettingsManager : MonoBehaviour
     {
         Instance._SaveSettings();
     }
-    public static Settings LoadData(string settings = "lastSavedSettings.json")
+    public static Settings LoadData(string settings = DEFAULT_SETTING)
     {
         return Instance._LoadData(settings);
     }
@@ -163,27 +170,35 @@ public class SettingsManager : MonoBehaviour
     private void _SaveSettings()
     {
         string settingsJson = JsonUtility.ToJson(_settings, true);
-        File.WriteAllText(Path.Combine(Application.dataPath, "lastSavedSettings.json"), settingsJson);
+        File.WriteAllText(UserSettingsFilepath, settingsJson);
         Debug.Log(settingsJson);
     }
-    private Settings _LoadData(string settings = "lastSavedSettings.json")
+
+    private Settings _LoadData(string settings = DEFAULT_SETTING)
     {
-        string filepath = Path.Combine(Application.dataPath, settings);
         string settingsJson;
-        if (File.Exists(filepath))
+        if (OverWriteLevelSettings && File.Exists(UserSettingsFilepath))
         {
-            settingsJson = File.ReadAllText(filepath);
+            settingsJson = File.ReadAllText(UserSettingsFilepath);
         }
         else
         {
-            filepath = Path.Combine(Application.dataPath, "lastSavedSettings.json");
-            settingsJson = File.ReadAllText(filepath);
+            TextAsset textAsset = Resources.Load<TextAsset>(settings);
+
+            if (textAsset == null)
+            {
+                textAsset = Resources.Load<TextAsset>(DEFAULT_SETTING);
+            }
+
+            settingsJson = textAsset.text;
+            Resources.UnloadAsset(textAsset);
         }
+       
         return JsonUtility.FromJson<Settings>(settingsJson);
     }
     private void _SetSettings(int index = 0)
     {
-        _settings = LoadData("settings " + index + ".json") ?? LoadData();
+        _settings = LoadData("settings " + index);
     }
 
 

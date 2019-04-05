@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour, IHittable
     [SerializeField] private string _horizontalAxis = "Horizontal";
     [SerializeField] private string _verticalAxis = "Vertical";
     [SerializeField] private KeyCode _fireKey = KeyCode.Space;
+    [SerializeField] private Camera _fpsCam;
 
     [Header("Movement Values")]
     [SerializeField, Range(0f, 2f)] private float _movementSpeed;
@@ -100,8 +101,7 @@ public class PlayerController : MonoBehaviour, IHittable
         CanMove = true;
         _startPos = this.transform.position;
         _startRot = this.transform.rotation;
-
-        
+        _fpsCam.gameObject.SetActive(SettingsManager.SplitScreenMode);
     }
 
 
