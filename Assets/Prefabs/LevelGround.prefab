@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 3449914323633042484}
   - component: {fileID: 3449914323633042505}
   - component: {fileID: 3449914323633042504}
-  - component: {fileID: 3449914323633042511}
   - component: {fileID: 8013006127734773044}
+  - component: {fileID: 6867918115170913686}
   m_Layer: 0
   m_Name: LevelWall (1)
   m_TagString: Wall
@@ -125,7 +125,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHorizontalBorder: 0
   _offset: 0.2
---- !u!82 &3449914323633042511
+  _wallHitSound: {fileID: 6867918115170913686}
+--- !u!114 &8013006127734773044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3449914323633042486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa67da9cdb639845895d61db054224b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!82 &6867918115170913686
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -221,18 +234,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &8013006127734773044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3449914323633042486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fa67da9cdb639845895d61db054224b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3449914323898995318
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,8 +248,8 @@ GameObject:
   - component: {fileID: 3449914323898995316}
   - component: {fileID: 3449914323898995337}
   - component: {fileID: 3449914323898995336}
-  - component: {fileID: 3449914323898995343}
   - component: {fileID: 5352793435677629556}
+  - component: {fileID: 1220906333346906416}
   m_Layer: 0
   m_Name: LevelWall
   m_TagString: Wall
@@ -358,7 +359,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHorizontalBorder: 0
   _offset: 0.2
---- !u!82 &3449914323898995343
+  _wallHitSound: {fileID: 1220906333346906416}
+--- !u!114 &5352793435677629556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3449914323898995318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa67da9cdb639845895d61db054224b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!82 &1220906333346906416
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -454,18 +468,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &5352793435677629556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3449914323898995318}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fa67da9cdb639845895d61db054224b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3449914324389136551
 GameObject:
   m_ObjectHideFlags: 0
@@ -576,7 +578,7 @@ GameObject:
   - component: {fileID: 3449914324557414832}
   - component: {fileID: 3449914324557414837}
   - component: {fileID: 3449914324557414836}
-  - component: {fileID: 3449914324557414859}
+  - component: {fileID: 3354631065382023780}
   - component: {fileID: 4167628573689925835}
   m_Layer: 0
   m_Name: LevelWall 2
@@ -687,7 +689,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHorizontalBorder: 1
   _offset: 0.2
---- !u!82 &3449914324557414859
+  _wallHitSound: {fileID: 3354631065382023780}
+--- !u!82 &3354631065382023780
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -809,7 +812,7 @@ GameObject:
   - component: {fileID: 3449914325591717405}
   - component: {fileID: 3449914325591717394}
   - component: {fileID: 3449914325591717393}
-  - component: {fileID: 3449914325591717392}
+  - component: {fileID: 3287975399177029275}
   - component: {fileID: 1705151844778870662}
   m_Layer: 0
   m_Name: LevelWall 2 (1)
@@ -920,7 +923,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHorizontalBorder: 1
   _offset: 0.2
---- !u!82 &3449914325591717392
+  _wallHitSound: {fileID: 3287975399177029275}
+--- !u!82 &3287975399177029275
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

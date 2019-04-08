@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour, IHittable
     [SerializeField] private string _verticalAxis = "Vertical";
     [SerializeField] private KeyCode _fireKey = KeyCode.Space;
     [SerializeField] private Camera _fpsCam;
+    [SerializeField] private int _playerNumber;
 
     [Header("Movement Values")]
     [SerializeField, Range(0f, 2f)] private float _movementSpeed;
@@ -27,6 +28,10 @@ public class PlayerController : MonoBehaviour, IHittable
     [Header("Bullet and Spawner")]
     [SerializeField] private BulletBehaviour _bulletPrefab;
     [SerializeField] private Transform _bulletSpawn;
+
+    [Header("Player Mesh and Color")]
+    [SerializeField] private MeshRenderer _playerMesh;
+    [SerializeField] private Color _meshColor;
 
     [Header("Knockback")]
     [SerializeField, Range(0f, 2f)] private float _knockbackDuration = 1f;
@@ -99,7 +104,8 @@ public class PlayerController : MonoBehaviour, IHittable
         IsInvisible = SettingsManager.InvisibleTankMode;
         _rotateTimer = 0f;
         CanMove = true;
-        _startPos = this.transform.position;
+        //_startPos = this.transform.position;
+        _startPos = LevelBuilder.Instance.PlayerStartPos[_playerNumber];
         _startRot = this.transform.rotation;
         _fpsCam.gameObject.SetActive(SettingsManager.SplitScreenMode);
     }
@@ -125,8 +131,6 @@ public class PlayerController : MonoBehaviour, IHittable
             MovePlayer(_input.y);
         }
 
-
-        //if (CanShoot && Input.GetKey(_fireKey))
         if (Input.GetKeyDown(_fireKey) && CanShoot)
         {
             FireWithMode(SettingsManager.BulletType);
@@ -134,8 +138,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
         if (SettingsManager.InvisibleTankMode)
         {
-            IsInvisible = CanShoot == true || CanMove == true;
-            
+            IsInvisible = CanShoot == true;
         }
     }
 
@@ -149,7 +152,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             Score--;
         }
-        else if(bullet.Player != this)
+        else if (bullet.Player != this)
         {
             bullet.Player.Score++;
         }
@@ -178,8 +181,9 @@ public class PlayerController : MonoBehaviour, IHittable
         IsInvincible = false;
         CanMove = false;
         Debug.LogWarning($"Reset Player {this.gameObject.name} to {_startPos}");
-        transform.position = _startPos;
+        transform.position = new Vector3(LevelBuilder.Instance.PlayerStartPos[_playerNumber].x, 0.25f, LevelBuilder.Instance.PlayerStartPos[_playerNumber].y);
         transform.rotation = _startRot;
+        _playerMesh.sharedMaterial.color = _meshColor;
         CanMove = true;
 
     }
@@ -202,17 +206,26 @@ public class PlayerController : MonoBehaviour, IHittable
     }
 
     // --------------------------------------------------------------------------------------------
+    private IEnumerator FlickerMaterial()
+    {
+        while (IsInvincible)
+        {
+            _playerMesh.material.color = _meshColor;
+            yield return new WaitForSeconds(0.1f);
+            _playerMesh.material.color = Color.white;
+            yield return new WaitForSeconds(0.1f);
+        }
+        _playerMesh.material.color = _meshColor;
+    }
     private IEnumerator GotHitRoutine(Vector3 direction)
     {
         CanMove = false;
         IsInvincible = true;
-
         float startTime = Time.time;
         float t = 0f;
-
         float startRotation = transform.rotation.y;
         float endRotation = startRotation + (_hitRotationSpeed * _knockbackDuration);
-
+        StartCoroutine(FlickerMaterial());
         while (t < 1f)
         {
             t = (Time.time - startTime) / _knockbackDuration;
@@ -220,10 +233,8 @@ public class PlayerController : MonoBehaviour, IHittable
             transform.rotation = Quaternion.Euler(0f, rot, 0f);
             float power = NeoxMath.Lerp(_knockbackPower, 0f, t, _knockbackInterpolation);
             transform.position += direction * power * Time.deltaTime;
-
             yield return null;
         }
-
         CanMove = true;
         yield return new WaitForSeconds(1f);
         IsInvincible = false;

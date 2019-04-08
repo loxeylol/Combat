@@ -429,6 +429,7 @@ MonoBehaviour:
   _verticalAxis: Vertical
   _fireKey: 32
   _fpsCam: {fileID: 6645082732056805059}
+  _playerNumber: 0
   _movementSpeed: 2
   _rotateFree: 0
   _freeRotationSpeed: 100
@@ -436,6 +437,8 @@ MonoBehaviour:
   _bulletPrefab: {fileID: 5005263734783464779, guid: 720e795e69c04974a9b62aadb0fcbc36,
     type: 3}
   _bulletSpawn: {fileID: 3881859650074219707}
+  _playerMesh: {fileID: 2791262035581625590}
+  _meshColor: {r: 0.039443612, g: 1, b: 0, a: 0}
   _knockbackDuration: 1
   _knockbackPower: 5
   _knockbackInterpolation: 0

@@ -3,13 +3,14 @@
     "_friendlyFire": false,
     "_invisibleTankMode": false,
     "_canBulletsBeDirected": false,
-    "_bulletType": 1,
-    "_fireModes": 2,
+    "_bulletType": 0,
+    "_fireModes": 0 ,
     "_playerRotationSteps": 2,
     "_maxScore": 2,
     "_gameTimer": 60.0,
     "_isThereTimeLimit": false,
     "_levelRange": 5,
     "_bulletLifeTime": 4.0,
+    "_splitScreenMode": false,
     "_highscore": 0
 }

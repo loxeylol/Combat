@@ -32,6 +32,7 @@ public class LevelBuilder : MonoBehaviour
     {
         get => _cubeLevels.Length;
     }
+    public Vector2[] PlayerStartPos => _cubeLevels[LevelIndex]._playerStartPos;
     // --- Unity Functions --------------------------------------------------------------------------------------------
     private void Awake()
     {

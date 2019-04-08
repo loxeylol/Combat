@@ -32,6 +32,36 @@ PrefabInstance:
       propertyPath: _verticalAxis
       value: VerticalPlayerTwo
       objectReference: {fileID: 0}
+    - target: {fileID: 1627056339543488238, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: _fpsCam
+      value: 
+      objectReference: {fileID: 2147053846075640904}
+    - target: {fileID: 1627056339543488238, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: _playerMesh
+      value: 
+      objectReference: {fileID: 7444243033648404093}
+    - target: {fileID: 1627056339543488238, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: _meshColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1627056339543488238, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: _meshColor.g
+      value: 0.0698705
+      objectReference: {fileID: 0}
+    - target: {fileID: 1627056339543488238, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: _meshColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6645082732056805059, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: m_NormalizedViewPortRect.x
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3982095305604394468, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -87,6 +117,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2791262035581625590, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5416fcb55fb87c44d878a5bd268b02c5, type: 2}
     - target: {fileID: 79299006664399294, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
         type: 3}
       propertyPath: _playerLabel
@@ -102,13 +137,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 6645082732056805059, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
-        type: 3}
-      propertyPath: m_NormalizedViewPortRect.x
-      value: 0.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88c0fbc84b880124fa22ba9d0f674fa8, type: 3}
+--- !u!23 &7444243033648404093 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2791262035581625590, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+    type: 3}
+  m_PrefabInstance: {fileID: 4752368055863636619}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8371328975946049072 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3881859650074219707, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
@@ -133,3 +169,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!20 &2147053846075640904 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6645082732056805059, guid: 88c0fbc84b880124fa22ba9d0f674fa8,
+    type: 3}
+  m_PrefabInstance: {fileID: 4752368055863636619}
+  m_PrefabAsset: {fileID: 0}

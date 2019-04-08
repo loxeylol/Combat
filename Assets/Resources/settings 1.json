@@ -11,5 +11,6 @@
     "_isThereTimeLimit": false,
     "_levelRange": 5,
     "_bulletLifeTime": 2.0,
+	"_splitScreenMode": false,
     "_highscore": 0
 }

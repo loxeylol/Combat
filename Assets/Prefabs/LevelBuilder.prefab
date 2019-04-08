@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68830c7d8b4cfa540a6de4294bb357ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelIndex: 3
+  _levelIndex: 5
   _cubeLevels:
   - _cubePositions:
     - {x: -4, y: -2}
@@ -116,7 +116,7 @@ MonoBehaviour:
     - {x: 4, y: 0}
     type: 11
   - _cubePositions:
-    - {x: -5, y: 3.45}
+    - {x: -4, y: -1.5}
     - {x: -3, y: -1}
     - {x: -2.5, y: 0}
     - {x: -3, y: 1}
